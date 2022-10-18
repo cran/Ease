@@ -2,42 +2,22 @@
 % Please edit documentation in R/UserFunctions.R
 \name{getRecords}
 \alias{getRecords}
-\title{Retrieving simulation records}
+\title{Getting the simulation results}
 \usage{
-getRecords(easeObj)
+getRecords(metapop)
 }
 \arguments{
-\item{easeObj}{an \code{Ease} object}
+\item{metapop}{a \code{Metapopulation} objects}
 }
 \value{
-A list of \code{data.frame} corresponding to the records of the
-simulations.
+A list where each item is associated with a simulation. Each of
+these elements consists of a list of data.frames, one per population.
+These data.frames consist of the same columns as the results
+(see \link[Ease]{getResults} documentation), except that they do not
+include the stop conditions.
 }
 \description{
-A simple function to retrieve the records of a simulation of an
-\code{Ease} object.
-}
-\examples{
-LD <- list(dl = as.factor(c("A", "a")))
-HL <- list(hl = as.factor(c("B", "b")))
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-selectionObj <- setSelectOnInds(
-  genomeObj = genomeObj,
-  indFit = c(1, 1, 1, 1, 0.5, 0)
-)
-mutMatrixObj <- setMutationMatrixByRates(genomeObj = genomeObj, forwardMut = 1e-2)
-mod <- setEase(
-  N = 100, threshold = 1e6, dioecy = FALSE, selfRate = 0.5,
-  stopCondition = list("a", "b"),
-  mutMatrixObj = mutMatrixObj,
-  genomeObj = genomeObj,
-  selectionObj = selectionObj
-)
-
-mod <- simulate(mod, recording = TRUE, nsim = 10)
-
-getRecords(mod)
-
+Getting the simulation results
 }
 \author{
 Ehouarn Le Faou

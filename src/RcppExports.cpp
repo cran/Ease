@@ -10,43 +10,51 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// SIMULATION_MULTIPLE
-List SIMULATION_MULTIPLE(int nsim, bool recording, int recordGenGap, bool drift, int nbHaplo, int nbGeno, int nbAlleles, NumericMatrix initGenoFreq, NumericMatrix gametogenesisMat, int N, int threshold, bool dioecy, const double selfRate, List stopCondition, NumericMatrix haploCrossMat, NumericMatrix alleleFreqMat, NumericVector femgamFit, NumericVector malegamFit, NumericVector femindFit, NumericVector maleindFit, NumericVector indFit, NumericVector femProdFit, NumericVector maleProdFit, bool verbose);
-RcppExport SEXP _Ease_SIMULATION_MULTIPLE(SEXP nsimSEXP, SEXP recordingSEXP, SEXP recordGenGapSEXP, SEXP driftSEXP, SEXP nbHaploSEXP, SEXP nbGenoSEXP, SEXP nbAllelesSEXP, SEXP initGenoFreqSEXP, SEXP gametogenesisMatSEXP, SEXP NSEXP, SEXP thresholdSEXP, SEXP dioecySEXP, SEXP selfRateSEXP, SEXP stopConditionSEXP, SEXP haploCrossMatSEXP, SEXP alleleFreqMatSEXP, SEXP femgamFitSEXP, SEXP malegamFitSEXP, SEXP femindFitSEXP, SEXP maleindFitSEXP, SEXP indFitSEXP, SEXP femProdFitSEXP, SEXP maleProdFitSEXP, SEXP verboseSEXP) {
+// METAPOP_SIMULATION
+List METAPOP_SIMULATION(int nbPop, List ids, NumericMatrix migMat, int nsim, bool verbose, bool recording, int recordGenGap, bool drift, int nbHaplo, int nbGeno, CharacterVector idGeno, int nbAlleles, CharacterVector idAlleles, int nbLoci, List initGenoFreq, NumericMatrix meiosisMat, NumericMatrix gametogenesisMat, List popSize, int threshold, bool dioecy, List selfRate, List stopCondition, CharacterVector IDstopCondition, NumericMatrix haploCrossMat, NumericMatrix alleleFreqMat, List gamFit, List indFit, List gamProdFit, List demography, List growthRate, List initPopSize, String nameOutFunct);
+RcppExport SEXP _Ease_METAPOP_SIMULATION(SEXP nbPopSEXP, SEXP idsSEXP, SEXP migMatSEXP, SEXP nsimSEXP, SEXP verboseSEXP, SEXP recordingSEXP, SEXP recordGenGapSEXP, SEXP driftSEXP, SEXP nbHaploSEXP, SEXP nbGenoSEXP, SEXP idGenoSEXP, SEXP nbAllelesSEXP, SEXP idAllelesSEXP, SEXP nbLociSEXP, SEXP initGenoFreqSEXP, SEXP meiosisMatSEXP, SEXP gametogenesisMatSEXP, SEXP popSizeSEXP, SEXP thresholdSEXP, SEXP dioecySEXP, SEXP selfRateSEXP, SEXP stopConditionSEXP, SEXP IDstopConditionSEXP, SEXP haploCrossMatSEXP, SEXP alleleFreqMatSEXP, SEXP gamFitSEXP, SEXP indFitSEXP, SEXP gamProdFitSEXP, SEXP demographySEXP, SEXP growthRateSEXP, SEXP initPopSizeSEXP, SEXP nameOutFunctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type nbPop(nbPopSEXP);
+    Rcpp::traits::input_parameter< List >::type ids(idsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type migMat(migMatSEXP);
     Rcpp::traits::input_parameter< int >::type nsim(nsimSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< bool >::type recording(recordingSEXP);
     Rcpp::traits::input_parameter< int >::type recordGenGap(recordGenGapSEXP);
     Rcpp::traits::input_parameter< bool >::type drift(driftSEXP);
     Rcpp::traits::input_parameter< int >::type nbHaplo(nbHaploSEXP);
     Rcpp::traits::input_parameter< int >::type nbGeno(nbGenoSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type idGeno(idGenoSEXP);
     Rcpp::traits::input_parameter< int >::type nbAlleles(nbAllelesSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type initGenoFreq(initGenoFreqSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type idAlleles(idAllelesSEXP);
+    Rcpp::traits::input_parameter< int >::type nbLoci(nbLociSEXP);
+    Rcpp::traits::input_parameter< List >::type initGenoFreq(initGenoFreqSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type meiosisMat(meiosisMatSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type gametogenesisMat(gametogenesisMatSEXP);
-    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< List >::type popSize(popSizeSEXP);
     Rcpp::traits::input_parameter< int >::type threshold(thresholdSEXP);
     Rcpp::traits::input_parameter< bool >::type dioecy(dioecySEXP);
-    Rcpp::traits::input_parameter< const double >::type selfRate(selfRateSEXP);
+    Rcpp::traits::input_parameter< List >::type selfRate(selfRateSEXP);
     Rcpp::traits::input_parameter< List >::type stopCondition(stopConditionSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type IDstopCondition(IDstopConditionSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type haploCrossMat(haploCrossMatSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type alleleFreqMat(alleleFreqMatSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type femgamFit(femgamFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type malegamFit(malegamFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type femindFit(femindFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type maleindFit(maleindFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type indFit(indFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type femProdFit(femProdFitSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type maleProdFit(maleProdFitSEXP);
-    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(SIMULATION_MULTIPLE(nsim, recording, recordGenGap, drift, nbHaplo, nbGeno, nbAlleles, initGenoFreq, gametogenesisMat, N, threshold, dioecy, selfRate, stopCondition, haploCrossMat, alleleFreqMat, femgamFit, malegamFit, femindFit, maleindFit, indFit, femProdFit, maleProdFit, verbose));
+    Rcpp::traits::input_parameter< List >::type gamFit(gamFitSEXP);
+    Rcpp::traits::input_parameter< List >::type indFit(indFitSEXP);
+    Rcpp::traits::input_parameter< List >::type gamProdFit(gamProdFitSEXP);
+    Rcpp::traits::input_parameter< List >::type demography(demographySEXP);
+    Rcpp::traits::input_parameter< List >::type growthRate(growthRateSEXP);
+    Rcpp::traits::input_parameter< List >::type initPopSize(initPopSizeSEXP);
+    Rcpp::traits::input_parameter< String >::type nameOutFunct(nameOutFunctSEXP);
+    rcpp_result_gen = Rcpp::wrap(METAPOP_SIMULATION(nbPop, ids, migMat, nsim, verbose, recording, recordGenGap, drift, nbHaplo, nbGeno, idGeno, nbAlleles, idAlleles, nbLoci, initGenoFreq, meiosisMat, gametogenesisMat, popSize, threshold, dioecy, selfRate, stopCondition, IDstopCondition, haploCrossMat, alleleFreqMat, gamFit, indFit, gamProdFit, demography, growthRate, initPopSize, nameOutFunct));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_Ease_SIMULATION_MULTIPLE", (DL_FUNC) &_Ease_SIMULATION_MULTIPLE, 24},
+    {"_Ease_METAPOP_SIMULATION", (DL_FUNC) &_Ease_METAPOP_SIMULATION, 32},
     {NULL, NULL, 0}
 };
 

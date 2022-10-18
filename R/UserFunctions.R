@@ -2,18 +2,57 @@
 #                               User Functions                                 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
+## Mutation matrix ----
+
+
+#' Definition of a mutation
+#'
+#' Utility function to easily generate a mutation matrix
+#' (see \link[Ease]{setMutationMatrix}).
+#'
+#' Mutation occurs from one allele to another at a specific rate. Please
+#' take care to define alleles as traits, that these alleles are present
+#' in the genome you are using and that the alleles are associated with
+#' the same locus.
+#'
+#' @param from name of the original allele
+#' @param to name of the mutant allele
+#' @param rate rate at which the mutation occurs
+#'
+#' @return A standardised list of input parameters that will be used by the
+#' function \link[Ease]{setMutationMatrix} to generate the mutation matrix.
+#'
+#' @examples
+#' ### Example with two loci, each with two alleles ###
+#'
+#' # Definition of the genome
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
+#'
+#' # The mutation function allows each transition from one allele to
+#' # another to be defined individually, to produce the mutation matrix
+#' # as follows:
+#' mutMatrixObj <- setMutationMatrix(genomeObj,
+#'   mutations = list(
+#'     mutation(from = "A", to = "a", rate = 0.1),
+#'     mutation(from = "B", to = "b", rate = 0.1)
+#'   )
+#' )
+#'
+#' @export
+mutation <- function(from, to, rate) {
+  return(list(from = from, to = to, rate = rate))
+}
+
 
 #' Setting the mutation matrix
 #'
-#' Generation of the mutation matrix associated with the genome given as input
-#' and specifying the mutation matrices locus by locus by the arguments
-#' \code{mutHapLoci} and \code{mutDipLoci}.
-#'
+#' Generation of the mutation matrix associated with the genome given as input.
 #' A mutation matrix is used to simulate mutations that affect loci. An object
 #' of the class \code{MutationMatrix} does not only contain a (genotypic)
 #' mutation matrix. It also contains the attributes necessary for the
 #' construction and easy-to-read display of this matrix.
-#'
 #' The mutation matrix itself is a square matrix of size equal to the number of
 #' genotypes. It is a probability matrix in that the sum of the values in
 #' each row is equal to 1. For a given genotype, the row associated with it
@@ -21,96 +60,125 @@
 #' genotype to the production of the other genotypes (and of itself if there
 #' are no mutations).
 #'
+#' There are three ways to define the mutation matrix associated with a
+#' \code{Genome} class object.
+#'
+#' 1) By giving two lists of allelic mutation matrices \code{mutHapLoci} and
+#' \code{mutDipLoci}, for haploid and diploid loci respectively. Each of
+#' these lists contains as many matrices as there are loci. These matrices
+#' are transition matrices (squares, with the sum of the rows equal to 1)
+#' of size equal to the number of alleles at the locus concerned.
+#'
+#' 2) By giving a forward and a backward allelic mutation rate
+#' (\code{forwardMut} and \code{backwardMut} respectively). The generated
+#' mutation matrices will thus be defined with the same rates for all loci. A
+#' forward mutation rate means that the transition from one allele to another
+#' is done in the order in which they were defined when the Genome class object
+#' was created, and in the other direction for the backward rate.
+#'
+#' 3) By giving a list of \code{mutations} generated through the
+#' \link[Ease]{mutation} function.
+#'
 #' @param genomeObj a \code{Genome} object
-#' @param mutHapLoci a list of haploid locus by locus allelic mulation matrices.
-#' @param mutDipLoci a list of diploid locus by locus allelic mulation matrices.
+#' @param ... see details.
 #'
 #' @return a \code{MutationMatrix} object
 #'
 #' @examples
 #' ### Example with two loci, each with two alleles ###
-#' # Definition of the diploid locus
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' # Definition of the haploid locus
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' # Definition of the object of Genome class
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#' # The mutation matrices can be defined as follows:
-#' mutHapLoci <- list(matrix(c(0.9, 0.1, 0.1, 0.9), 2))
+#'
+#' # Definition of the genome
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
+#'
+#' # Three ways to define the same mutation matrix associated with the
+#' # genome defined above:
+#'
+#' # 1) Mutation matrix from matrices
+#' mutHapLoci <- list(matrix(c(0.99, 0.01, 0.01, 0.99), 2))
 #' mutDipLoci <- list(matrix(c(0.99, 0.01, 0.01, 0.99), 2))
 #' # One can then define the MutationMatrix class object:
-#' setMutationMatrix(genomeObj, mutHapLoci, mutDipLoci)
+#' setMutationMatrix(genomeObj,
+#'   mutHapLoci = mutHapLoci,
+#'   mutDipLoci = mutDipLoci
+#' )
 #'
-#' @author Ehouarn Le Faou
-#'
-#' @importFrom methods new
-#'
-#' @export
-setMutationMatrix <- function(genomeObj, mutHapLoci, mutDipLoci) {
-  return(new("MutationMatrix", genomeObj, mutHapLoci, mutDipLoci))
-}
-
-#' Setting the mutation matrix by rates
-#'
-#' Generation of the mutation matrix associated with the genome given as input
-#' and specifying the forward and backward mutation rates.
-#'
-#' A mutation matrix is used to simulate mutations that affect loci. An object
-#' of the class \code{MutationMatrix} does not only contain a (genotypic)
-#' mutation matrix. It also contains the attributes necessary for the
-#' construction and easy-to-read display of this matrix.
-#'
-#' The mutation matrix itself is a square matrix of size equal to the number of
-#' genotypes. It is a probability matrix in that the sum of the values in
-#' each row is equal to 1. For a given genotype, the row associated with it
-#' describes the probabilistic proportions that lead by mutation of this
-#' genotype to the production of the other genotypes (and of itself if there
-#' are no mutations).
-#'
-#' @param genomeObj a \code{Genome} object
-#' @param forwardMut the forward mutation rate
-#' @param backwardMut the backward mutation rate
-#'
-#' @return a \code{MutationMatrix} object
-#'
-#' @examples
-#' ### Example with two loci, each with two alleles ###
-#' # Definition of the diploid locus
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' # Definition of the haploid locus
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' # Definition of the object of Genome class
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#' # The mutation matrices can be defined as follows:
-#' mutMatrixObj <- setMutationMatrixByRates(genomeObj, forwardMut = 1e-3)
-#' mutMatrixObj
-#'
-#' # One can also add a backward mutation rate:
-#' mutMatrixObj <- setMutationMatrixByRates(genomeObj,
+#' # 2) Mutation matrix from mutation rates
+#' mutMatrixObj <- setMutationMatrix(genomeObj, forwardMut = 0.1)
+#' # or by adding a backward mutation rate:
+#' mutMatrixObj <- setMutationMatrix(genomeObj,
 #'   forwardMut = 1e-3,
 #'   backwardMut = 1e-4
 #' )
-#' mutMatrixObj
+#'
+#' # 3) Mutation matrix from single mutation definition
+#' mutMatrixObj <- setMutationMatrix(genomeObj,
+#'   mutations = list(
+#'     mutation(from = "A", to = "a", rate = 0.1),
+#'     mutation(from = "B", to = "b", rate = 0.1)
+#'   )
+#' )
 #'
 #' @author Ehouarn Le Faou
 #'
 #' @importFrom methods new
 #'
 #' @export
-setMutationMatrixByRates <- function(genomeObj, forwardMut = 0,
-                                     backwardMut = 0) {
-  if (forwardMut < 0 | forwardMut > 1 | backwardMut < 0 | backwardMut > 1) {
-    stop("Forward and backward mutation rates should be between 0 and 1.")
+setMutationMatrix <- function(genomeObj, ...) {
+  args <- list(...)
+  argsNames <- names(args)
+  if ("mutHapLoci" %in% argsNames | "mutDipLoci" %in% argsNames) {
+    if (is.null(args[["mutHapLoci"]])) {
+      mutHapLoci <- list()
+    } else {
+      mutHapLoci <- args[["mutHapLoci"]]
+    }
+    if (is.null(args[["mutDipLoci"]])) {
+      mutDipLoci <- list()
+    } else {
+      mutDipLoci <- args[["mutDipLoci"]]
+    }
+    return(new("MutationMatrix", genomeObj, mutHapLoci, mutDipLoci))
+  } else if ("forwardMut" %in% argsNames | "backwardMut" %in% argsNames) {
+    if (is.null(args[["forwardMut"]])) {
+      forwardMut <- 0
+    } else {
+      forwardMut <- args[["forwardMut"]]
+    }
+    if (is.null(args[["backwardMut"]])) {
+      backwardMut <- 0
+    } else {
+      backwardMut <- args[["backwardMut"]]
+    }
+
+    if (forwardMut < 0 | forwardMut > 1 | backwardMut < 0 | backwardMut > 1) {
+      stop("Forward and backward mutation rates should be between 0 and 1.")
+    }
+    mutHapLoci <- lapply(genomeObj@listHapLoci, function(alleles) {
+      mutMatRates(alleles, forwardMut, backwardMut)
+    })
+    mutDipLoci <- lapply(genomeObj@listDipLoci, function(alleles) {
+      mutMatRates(alleles, forwardMut, backwardMut)
+    })
+    return(new("MutationMatrix", genomeObj, mutHapLoci, mutDipLoci))
+  } else if ("mutations" %in% argsNames) {
+    rates <- lapply(args[["mutations"]], function(x) x$rate)
+
+    if (any(rates < 0) | any(rates > 1)) {
+      stop("Mutation rates should be between 0 and 1.")
+    }
+
+    mutMats <- mutMatFriendly(genomeObj, args[["mutations"]])
+    return(new(
+      "MutationMatrix", genomeObj, mutMats[["mutHapLoci"]],
+      mutMats[["mutDipLoci"]]
+    ))
   }
-  mutHapLoci <- lapply(genomeObj@listHapLoci, function(alleles) {
-    mutMatRates(alleles, forwardMut, backwardMut)
-  })
-  mutDipLoci <- lapply(genomeObj@listDipLoci, function(alleles) {
-    mutMatRates(alleles, forwardMut, backwardMut)
-  })
-  return(new("MutationMatrix", genomeObj, mutHapLoci, mutDipLoci))
+  stop("Invalid input. See ?setMutationMatrix")
 }
 
+## Genome ----
 
 #' Setting the genome
 #'
@@ -155,9 +223,9 @@ setMutationMatrixByRates <- function(genomeObj, forwardMut = 0,
 #' @return a \code{Genome} object
 #'
 #' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 #'
 #' @author Ehouarn Le Faou
 #'
@@ -166,8 +234,17 @@ setMutationMatrixByRates <- function(genomeObj, forwardMut = 0,
 #' @export
 setGenome <- function(listHapLoci = list(), listDipLoci = list(),
                       recRate = numeric()) {
+  if (all(sapply(listHapLoci, inherits, what = "character"))) {
+    listHapLoci <- lapply(listHapLoci, as.factor)
+  }
+  if (all(sapply(listDipLoci, inherits, what = "character"))) {
+    listDipLoci <- lapply(listDipLoci, as.factor)
+  }
   return(new("Genome", listHapLoci, listDipLoci, recRate))
 }
+
+
+## Selection ----
 
 #' Setting the selection
 #'
@@ -192,26 +269,26 @@ setGenome <- function(listHapLoci = list(), listDipLoci = list(),
 #' @examples
 #' ### Example with two loci, each with two alleles ###
 #' # Definition of the diploid locus
-#' LD <- list(dl = as.factor(c("A", "a")))
+#' DL <- list(dl = c("A", "a"))
 #' # Definition of the haploid locus
-#' HL <- list(hl = as.factor(c("B", "b")))
+#' HL <- list(hl = c("B", "b"))
 #' # Definition of the object of Genome class
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 #' genomeObj
 #'
 #' ### Exemple with more diploid loci ###
 #' # Definition of the diploid loci
-#' LD <- list(
-#'   dl1 = as.factor(c("A", "a")),
-#'   dl2 = as.factor(c("B", "b")),
-#'   dl3 = as.factor(c("C", "c"))
+#' DL <- list(
+#'   dl1 = c("A", "a"),
+#'   dl2 = c("B", "b"),
+#'   dl3 = c("C", "c")
 #' )
 #' # Definition of the haploid locus
-#' HL <- list(hl = as.factor(c("D", "d")))
+#' HL <- list(hl = c("D", "d"))
 #' # Definition of the object of Genome class, with in addition the necessary
 #' # definition of recombination rates between loci:
 #' genomeObj <- setGenome(
-#'   listHapLoci = HL, listDipLoci = LD,
+#'   listHapLoci = HL, listDipLoci = DL,
 #'   recRate = c(0.1, 0.5)
 #' )
 #' # Here we have a 0.1 recombination rate between dl1 and dl2 and a 0.5
@@ -251,9 +328,9 @@ setSelectNeutral <- function(genomeObj) {
 #' @return a \code{Selection} object
 #'
 #' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 #' selectionObj <- setSelectOnInds(
 #'   genomeObj = genomeObj,
 #'   indFit = c(1, 1, 1, 1, 0.5, 0)
@@ -283,28 +360,33 @@ setSelectOnInds <- function(genomeObj = NULL, indFit = c(), femaleFit = c(),
         "because a selection object is specified."
       ))
     }
+    genomeObj <- selectionObj@genome
   }
+  indFit <- selectInputTreatment(indFit, genomeObj)
+  femaleFit <- selectInputTreatment(femaleFit, genomeObj)
+  maleFit <- selectInputTreatment(maleFit, genomeObj)
+
   if (all(sapply(list(indFit, femaleFit, maleFit), length) == 0)) {
     return(selectionObj)
   }
   if (length(indFit) > 0 && length(maleFit) == 0 && length(femaleFit) == 0) {
-    selectionObj@femindFit <- indFit
-    selectionObj@maleindFit <- indFit
-    selectionObj@indFit <- indFit
+    selectionObj@indFit[["female"]] <- indFit
+    selectionObj@indFit[["male"]] <- indFit
+    selectionObj@indFit[["ind"]] <- indFit
   } else {
     if (length(indFit) > 0) {
-      selectionObj@indFit <- indFit
+      selectionObj@indFit[["ind"]] <- indFit
     }
     if (length(femaleFit) > 0) {
-      selectionObj@femindFit <- femaleFit
+      selectionObj@indFit[["female"]] <- femaleFit
     }
     if (length(maleFit) > 0) {
-      selectionObj@maleindFit <- maleFit
+      selectionObj@indFit[["male"]] <- maleFit
     }
   }
-  names(selectionObj@femindFit) <- selectionObj@IDgenotypes
-  names(selectionObj@maleindFit) <- selectionObj@IDgenotypes
-  names(selectionObj@indFit) <- selectionObj@IDgenotypes
+  names(selectionObj@indFit[["female"]]) <- selectionObj@IDgenotypes
+  names(selectionObj@indFit[["male"]]) <- selectionObj@IDgenotypes
+  names(selectionObj@indFit[["ind"]]) <- selectionObj@IDgenotypes
   selectionObj@sOnInds <- TRUE
 
   validObject(selectionObj)
@@ -329,9 +411,9 @@ setSelectOnInds <- function(genomeObj = NULL, indFit = c(), femaleFit = c(),
 #' @return a \code{Selection} object
 #'
 #' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 #' selectionObj <- setSelectOnGametes(
 #'   genomeObj = genomeObj,
 #'   gamFit = c(1, 1, 0.5, 0)
@@ -361,7 +443,12 @@ setSelectOnGametes <- function(genomeObj = NULL, gamFit = c(), femaleFit = c(),
         "because a selection object is specified."
       ))
     }
+    genomeObj <- selectionObj@genome
   }
+
+  gamFit <- selectInputTreatment(gamFit, genomeObj, haplo = TRUE)
+  femaleFit <- selectInputTreatment(femaleFit, genomeObj, haplo = TRUE)
+  maleFit <- selectInputTreatment(maleFit, genomeObj, haplo = TRUE)
 
   if (all(sapply(list(gamFit, femaleFit, maleFit), length) == 0)) {
     return(selectionObj)
@@ -376,18 +463,18 @@ setSelectOnGametes <- function(genomeObj = NULL, gamFit = c(), femaleFit = c(),
     ))
   }
   if (length(gamFit) > 0) {
-    selectionObj@femgamFit <- gamFit
-    selectionObj@malegamFit <- gamFit
+    selectionObj@gamFit[["female"]] <- gamFit
+    selectionObj@gamFit[["male"]] <- gamFit
   } else {
     if (length(femaleFit) > 0) {
-      selectionObj@femgamFit <- femaleFit
+      selectionObj@gamFit[["female"]] <- femaleFit
     }
     if (length(maleFit) > 0) {
-      selectionObj@malegamFit <- maleFit
+      selectionObj@gamFit[["male"]] <- maleFit
     }
   }
-  names(selectionObj@femgamFit) <- selectionObj@IDhaplotypes
-  names(selectionObj@malegamFit) <- selectionObj@IDhaplotypes
+  names(selectionObj@gamFit[["female"]]) <- selectionObj@IDhaplotypes
+  names(selectionObj@gamFit[["male"]]) <- selectionObj@IDhaplotypes
   selectionObj@sOnGams <- TRUE
 
   validObject(selectionObj)
@@ -412,9 +499,9 @@ setSelectOnGametes <- function(genomeObj = NULL, gamFit = c(), femaleFit = c(),
 #' @return a \code{Selection} object
 #'
 #' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 #' selectionObj <- setSelectOnGametesProd(
 #'   genomeObj = genomeObj,
 #'   indProdFit = c(1, 1, 1, 1, 0.5, 0)
@@ -445,7 +532,13 @@ setSelectOnGametesProd <- function(genomeObj = NULL, indProdFit = c(),
         "because a selection object is specified."
       ))
     }
+    genomeObj <- selectionObj@genome
   }
+
+  indProdFit <- selectInputTreatment(indProdFit, genomeObj)
+  femProdFit <- selectInputTreatment(femProdFit, genomeObj)
+  maleProdFit <- selectInputTreatment(maleProdFit, genomeObj)
+
   if (all(sapply(list(indProdFit, femProdFit, maleProdFit), length) == 0)) {
     return(selectionObj)
   }
@@ -457,272 +550,254 @@ setSelectOnGametesProd <- function(genomeObj = NULL, indProdFit = c(),
     ))
   }
   if (length(indProdFit) > 0) {
-    selectionObj@femProdFit <- indProdFit
-    selectionObj@maleProdFit <- indProdFit
+    selectionObj@gamProdFit[["female"]] <- indProdFit
+    selectionObj@gamProdFit[["male"]] <- indProdFit
   } else {
     if (length(femProdFit) > 0) {
-      selectionObj@femProdFit <- femProdFit
+      selectionObj@gamProdFit[["female"]] <- femProdFit
     }
     if (length(maleProdFit) > 0) {
-      selectionObj@maleProdFit <- maleProdFit
+      selectionObj@gamProdFit[["male"]] <- maleProdFit
     }
   }
-  names(selectionObj@femProdFit) <- selectionObj@IDgenotypes
-  names(selectionObj@maleProdFit) <- selectionObj@IDgenotypes
+  names(selectionObj@gamProdFit[["female"]]) <- selectionObj@IDgenotypes
+  names(selectionObj@gamProdFit[["male"]]) <- selectionObj@IDgenotypes
   selectionObj@sOnGamsProd <- TRUE
   validObject(selectionObj)
   return(selectionObj)
 }
 
 
-#' Setting the parameters for simulating a model
+## Population ----
+
+#' Setting a population
 #'
-#' Last step before the simulation of the model, the creation of a \code{Ease}
-#' class object makes it possible to gather all the ingredients for a complete
-#' parameterization of a model and then to simulate it.
+#' Generation of a population by providing all the necessary ingredients for
+#' its definition, including a genome, a mutation matrix and a selection regime.
 #'
-#' The \code{Ease} class is used to manage the simulations by handling the
-#' objects needed to build the model. Thus to build an object of class
-#' \code{Ease}, it is necessary to have defined an object \code{Genome},
-#' as well as an object \code{MutationMatrix} and an object \code{Selection}
-#' (even if it is neutral, see \link[Ease]{setSelectNeutral}).
+#' A population is defined strictly by a name, a size, a sexual system
+#' (dioecy or hermaphodite), and the three objects defined previously:
+#' genome, mutation matrix and selection. In addition to that, it is
+#' possible to define
+#'  - a selfing rate (by default equal to 0)
+#'  - a vector of initial genotypic frequencies
+#'  - a demography
 #'
-#' Once simulated with the method \code{simulate}, an Ease object contains
-#' the results of the simulations and the records of these last ones if the
-#' parameter \code{recording} of \code{simulate} was fixed at \code{TRUE}.
-#' To obtain these results and records, it is necessary to use the functions
-#' \link[Ease]{getResults} and \link[Ease]{getRecords}.
+#' Two demographic regimes are possible: no demography, i.e. a fixed population
+#' size, or demography, i.e. a population where the size fluctuates
+#' stochastically. The boolean argument `demography` is used to define whether
+#' there should be stochasticity. For a fixed population size, it is therefore
+#' sufficient to define that `demography = FALSE` (default) and to set the
+#' desired population size with the `popSize` parameter.
 #'
-#' @param N the population size
-#' @param threshold the maximum number of generations
+#' For a fluctuating demography, `demography` must be `TRUE` and three other
+#' parameters are then needed: the initial population size (`initPopSize`),
+#' the population growth rate (`growthRate`) and the carrying capacity of the
+#' population (the population size, `popSize`).
+#'
+#' It is also possible to avoid defining a population size altogether, by
+#' setting off the genetic drift (`drift` parameter). This will allow the
+#' model to be simulated deterministically.
+#'
+#' @param name the name of the population
+#' @param size the population size
 #' @param dioecy logical indicating whether the simulated population is
 #' dioecious or hermaphroditic
-#' @param mutMatrixObj a \code{MutationMatrix} object
 #' @param genomeObj a \code{Genome} object
+#' @param mutMatrixObj a \code{MutationMatrix} object
 #' @param selectionObj a \code{Selection} object
-#' @param stopCondition list of vectors that each describe the alleles that
-#' must be fixed to define a stop condition. Each of these stop conditions
-#' will therefore be associated with a stop condition
-#' @param initGenoFreq A vector of the size of the genotype number
-#' describing the initial allele frequencies common to all simulations
 #' @param selfRate the selfing rate
+#' @param demography a logic indicating whether the population should have
+#' a demography (stochasticity in the number of individuals present in the
+#' population + logistic growth with carrying capacity equal to the \code{size}
+#' parameter)
+#' @param growthRate a \code{Genome} object
+#' @param initPopSize the initial size of the population. It is necessarily
+#' equal to \code{size} if the population has no \code{demography}.
+#' @param initGenoFreq a vector of the size of the genotype number
+#' describing the initial allele frequencies common to all simulations
 #'
-#' @return an \code{Ease} object
+#' @return a \code{Population} object
 #'
 #' @examples
-#'
-#' library(tidyr)
-#' library(ggplot2)
-#'
-#' ### Simple example of a succession of allele replacements to each other
-#' # in a deterministic way and simply by mutations (selection is neutral) ###
-#'
-#' # Let's put a single diploid locus with 5 alleles:
-#' LD <- list(dl1 = as.factor(c("a1", "a2", "a3", "a4", "a5", "a6")))
-#' HL <- list(hl = as.factor("noHL"))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#'
-#' # The only possible mutations are mutations from the a1 to a2 allele,
-#' # from a2 to a3, etc.:
-#' mutMatrixObj <- setMutationMatrixByRates(
-#'   genomeObj = genomeObj,
-#'   forwardMut = 1e-2
+#' # Definition of a population in its simplest form:
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' mutations <- list(
+#'   mutation(from = "A", to = "a", rate = 1e-3),
+#'   mutation(from = "B", to = "b", rate = 1e-3)
 #' )
-#' # The matrix thus constructed looks like this:
-#' mutMatrixObj
-#'
-#' # The selection is neutral:
-#' selectionObjNeutral <- setSelectNeutral(genomeObj = genomeObj)
-#'
-#' # We can thus define an Ease object with a population size of 100
-#' # sex-separated individuals and a threshold of 700 generations:
-#' mod <- setEase(
-#'   N = 100, threshold = 700, dioecy = TRUE,
-#'   mutMatrixObj = mutMatrixObj,
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
+#' pop <- setPopulation(
+#'   name = "A",
+#'   size = 1000,
+#'   dioecy = TRUE,
 #'   genomeObj = genomeObj,
-#'   selectionObj = selectionObjNeutral
+#'   selectionObj = setSelectNeutral(genomeObj),
+#'   mutMatrixObj = setMutationMatrix(genomeObj, mutations = mutations)
 #' )
-#'
-#' # For the simulation we shut down the drift to have a deterministic
-#' # evolution of allelic frequencies:
-#' mod <- simulate(mod, recording = TRUE, verbose = TRUE, drift = FALSE)
-#'
-#' # We recover the \code{data.frame} of the simulation record and we modify
-#' # a little the organization of the data:
-#' records <- getRecords(mod)[[1]]
-#' records <- gather(records, "allele", "freqAllele", 45:50)
-#'
-#' # Then we display the evolution of the allelic frequencies of each of the
-#' # alleles of the locus:
-#' ggplot(records, aes(x = gen, y = freqAllele, color = allele)) +
-#'   geom_line() +
-#'   ylim(0, 1)
-#'
-#'
-#' ### Example of simulation of cyto-nuclear Bateson-Dobzhansky-Muller
-#' # incompatibilities (BDMI) ###
-#'
-#' # Two loci: a haploid locus and a diploid locus. Each has two alleles,
-#' # an ancestral allele in upper case and a derived allele in lower case:
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#'
-#' # The mutation rate to derived alleles is set at 1e-2:
-#' mutMatrixObj <- setMutationMatrixByRates(genomeObj = genomeObj, forwardMut = 1e-2)
-#'
-#' # The two derived alleles a and b are incompatible and therefore impose
-#' # a fitness cost on their carrier:
-#' selectionObj <- setSelectOnInds(
-#'   genomeObj = genomeObj,
-#'   indFit = c(1, 1, 1, 1, 0.5, 0)
-#' )
-#'
-#' # We can then define the Ease object by specifying the population size (100),
-#' # the maximum generation threshold (1e6), that we want the individuals to be
-#' # hermaphroditic (dioecy = FALSE) and that they reproduce at 50% by
-#' # selfing. The simulation stops if one of the two derived alleles is fixed:
-#' mod <- setEase(
-#'   N = 100, threshold = 1e6, dioecy = FALSE, selfRate = 0.5,
-#'   stopCondition = list("a", "b"),
-#'   mutMatrixObj = mutMatrixObj,
-#'   genomeObj = genomeObj,
-#'   selectionObj = selectionObj
-#' )
-#'
-#' # The model is simulated:
-#' mod <- simulate(mod, nsim = 10, verbose = TRUE)
-#'
-#' # And the results plotted:
-#' plot(mod)
 #'
 #' @author Ehouarn Le Faou
 #'
 #' @importFrom methods new
 #'
 #' @export
-setEase <- function(N, threshold, dioecy, mutMatrixObj, genomeObj,
-                    selectionObj, stopCondition = list(),
-                    initGenoFreq = matrix(), selfRate = NA_real_) {
+setPopulation <- function(name, size, dioecy, genomeObj, mutMatrixObj, selectionObj,
+                          selfRate = 0, demography = F, growthRate = 0,
+                          initPopSize = NULL, initGenoFreq = NULL) {
+  if (is.null(initPopSize)) {
+    if (demography) {
+      warning(paste(
+        "As demography is enabled but the population size is not",
+        "set, it is defined by default as equal to the regular",
+        "population size (size parameter)."
+      ))
+    }
+    initPopSize <- size
+  } else {
+    if (!demography & (initPopSize != size)) {
+      warning(paste(
+        "Without demography, the initial population size",
+        "(initPopSize parameter) is necessarily",
+        "equal to the regular population size (size",
+        "parameter)."
+      ))
+      initPopSize <- size
+    }
+  }
+
   return(new(
-    "Ease", N, threshold, dioecy, mutMatrixObj, genomeObj,
-    selectionObj, stopCondition, selfRate, initGenoFreq
+    "Population", name, size, dioecy, selfRate, demography, growthRate,
+    initGenoFreq, genomeObj, initPopSize, selectionObj, mutMatrixObj
   ))
 }
 
+## Metapopulation ----
 
-#' Retrieving simulation results
+#' Setting a metapopulation
 #'
-#' A simple function to retrieve the results of a simulation of an
-#' \code{Ease} object. The results can be given as a list of \code{data.frames}
-#' distinguishing: the parameters, the genotypic frequencies (unless
-#' they have not been recorded), the generations, and the stop conditions.
+#' A metapopulation is a set of population(s) (from 1) that are simulated
+#' with potential migration between them. Only genotypes can migrate, i.e.
+#' adult individuals.
 #'
-#' @param easeObj an \code{Ease} object
-#' @param asList logical defining whether the results should be output as a list
+#' The construction of a \code{Metapopulation} object requires only two
+#' arguments (one optional). The first is a population(s) list, defined
+#' from the population class. The second is a migration matrix, which
+#' connects the populations together. This matrix is a probability matrix
+#' (square with the sum of the rows equal to 1, whose size is equal to the
+#' number of populations) where each value corresponds to the proportion
+#' of individuals (genotypes) that disperse from their source population
+#' (row) to their target population (column).
 #'
-#' @return A \code{data.frame} corresponding to the results of the simulations.
-#' By default, the results are presented in the form of \code{data.frame}, each
-#' row corresponding to a simulation. The columns correspond, in order, to:
-#' - the parameters of the simulation: the population size, the generation
-#'   threshold, the sexual system and finally the self-fertilisation rate (also
-#'   present in dioecy, but always equal to 0);
-#' - the genotypic frequencies at the end of the simulation (of females,
-#'   then males, or only individuals in the case of hermaphrodites)
-#' - the allelic frequencies at the end of the simulation;
-#' - the generation at which the simulation stopped;
-#' - the stop conditions, one column being dedicated to each of them, they
-#'   indicate by logic if the simulation has reached these stop conditions;
-#' - the fitness of the individuals at the end of the simulation.
-#' The parameters \code{includeParams} and \code{includeFitness} of the
-#' \code{simulate} method can delete the input parameters and fitness
-#' of the result \code{data.frame} respectively.
+#' @param populations a list of \code{Population} objects
+#' @param migMat a migration matrix
+#'
+#' @return a \code{Metapopulation} object
 #'
 #' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#' selectionObj <- setSelectOnInds(
-#'   genomeObj = genomeObj,
-#'   indFit = c(1, 1, 1, 1, 0.5, 0)
+#' # Definition of a population in its simplest form:
+#' DL <- list(dl = c("A", "a"))
+#' HL <- list(hl = c("B", "b"))
+#' mutations <- list(
+#'   mutation(from = "A", to = "a", rate = 1e-3),
+#'   mutation(from = "B", to = "b", rate = 1e-3)
 #' )
-#' mutMatrixObj <- setMutationMatrixByRates(genomeObj = genomeObj, forwardMut = 1e-2)
-#' mod <- setEase(
-#'   N = 100, threshold = 1e6, dioecy = FALSE, selfRate = 0.5,
-#'   stopCondition = list("a", "b"),
-#'   mutMatrixObj = mutMatrixObj,
+#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
+#' pop <- setPopulation(
+#'   name = "A",
+#'   size = 1000,
+#'   dioecy = TRUE,
 #'   genomeObj = genomeObj,
-#'   selectionObj = selectionObj
+#'   selectionObj = setSelectNeutral(genomeObj),
+#'   mutMatrixObj = setMutationMatrix(genomeObj, mutations = mutations)
 #' )
+#' metapop <- setMetapopulation(populations = list(pop))
+#' metapop <- simulate(metapop, nsim = 10, seed = 123)
+#' # Other examples available in the documentation of the package
 #'
-#' mod <- simulate(mod, nsim = 10)
+#' @author Ehouarn Le Faou
 #'
-#' # As a single \code{data.frame} :
-#' getResults(mod)
+#' @importFrom methods new
 #'
-#' # As a list :
-#' getResults(mod, asList = TRUE)
+#' @export
+setMetapopulation <- function(populations, migMat = matrix(1)) {
+  return(new("Metapopulation", populations, migMat))
+}
+
+#' Getting the simulation results
+#'
+#' @param metapop a \code{Metapopulation} objects
+#'
+#' @return A data.frame where each line corresponds to a simulation. The
+#' results include :
+#' - the last generation reached (the threshold or the generation that first
+#' verified at least one of the stopping conditions)
+#' - the final population size
+#' - the genotype frequencies
+#' - allelic frequencies
+#' - the reason(s) for the stop (either the threshold was reached, i.e.
+#' \code{unstopped} or the stop condition(s) that was (were) reached, in the
+#' form of boolean values
+#' - Average fitness (individual, gamete production and gametic)
 #'
 #' @author Ehouarn Le Faou
 #'
 #' @export
-getResults <- function(easeObj, asList = FALSE) {
-  if (identical(easeObj@results, list())) {
-    stop(paste(
-      "No results available for this object (use the simulate",
-      "method to generate them)."
+getResults <- function(metapop) {
+  if (identical(dim(metapop@results), c(0L, 0L))) {
+    warning(paste(
+      "No results available for this metapopulation. Please use",
+      "the simulate method to generate them."
     ))
-  }
-  if (asList) {
-    return(easeObj@results)
   } else {
-    return(Reduce(cbind, easeObj@results))
+    return(metapop@results)
+  }
+}
+
+#' Getting the simulation results
+#'
+#' @param metapop a \code{Metapopulation} objects
+#'
+#' @return A list where each item is associated with a simulation. Each of
+#' these elements consists of a list of data.frames, one per population.
+#' These data.frames consist of the same columns as the results
+#' (see \link[Ease]{getResults} documentation), except that they do not
+#' include the stop conditions.
+#'
+#' @author Ehouarn Le Faou
+#'
+#' @export
+getRecords <- function(metapop) {
+  if (identical(metapop@records, list())) {
+    warning(paste(
+      "No records available for this metapopulation. Please use",
+      "the simulate method and activate the recording parameter",
+      "to generate them."
+    ))
+  } else {
+    return(metapop@records)
   }
 }
 
 
-
-
-#' Retrieving simulation records
+#' Getting the custom output
 #'
-#' A simple function to retrieve the records of a simulation of an
-#' \code{Ease} object.
+#' @param metapop a \code{Metapopulation} objects
 #'
-#' @param easeObj an \code{Ease} object
-#'
-#' @return A list of \code{data.frame} corresponding to the records of the
-#' simulations.
-#'
-#' @examples
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#' selectionObj <- setSelectOnInds(
-#'   genomeObj = genomeObj,
-#'   indFit = c(1, 1, 1, 1, 0.5, 0)
-#' )
-#' mutMatrixObj <- setMutationMatrixByRates(genomeObj = genomeObj, forwardMut = 1e-2)
-#' mod <- setEase(
-#'   N = 100, threshold = 1e6, dioecy = FALSE, selfRate = 0.5,
-#'   stopCondition = list("a", "b"),
-#'   mutMatrixObj = mutMatrixObj,
-#'   genomeObj = genomeObj,
-#'   selectionObj = selectionObj
-#' )
-#'
-#' mod <- simulate(mod, recording = TRUE, nsim = 10)
-#'
-#' getRecords(mod)
+#' @return The list generated through the custom result function, if at least
+#' it was specified during the simulation of the \code{Metapopulation}.
 #'
 #' @author Ehouarn Le Faou
 #'
 #' @export
-getRecords <- function(easeObj) {
-  if (identical(easeObj@records, list())) {
-    stop(paste(
-      "No records available for this object (use the simulate",
-      "method and the parameter recording = TRUE to generate them)."
+getCustomOutput <- function(metapop) {
+  if (is.null(unlist(metapop@customOutput))) {
+    warning(paste(
+      "No custom output available for this metapopulation. Please use",
+      "the simulate method and use the nameOutFunct parameter",
+      "to generate them."
     ))
+  } else {
+    return(metapop@customOutput)
   }
-  return(easeObj@records)
 }

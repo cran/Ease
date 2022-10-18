@@ -74,23 +74,10 @@ ensures that the two groups are independent.
 \item{\code{nbGeno}}{the number of genotypes}
 
 \item{\code{IDgenotypes}}{IDs of genotypes}
+
+\item{\code{IDgenome}}{ID of the genome}
 }}
 
-\examples{
-# Definition of loci:
-LD <- list(dl = as.factor(c("A", "a")))
-HL <- list(hl = as.factor(c("B", "b")))
-
-# Creation of the object:
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-
-# Showing:
-genomeObj
-
-# Printing:
-print(genomeObj)
-
-}
 \author{
 Ehouarn Le Faou
 }

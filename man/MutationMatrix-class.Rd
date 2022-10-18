@@ -40,6 +40,8 @@ are no mutations).
 \item{\code{nbHL}}{the number of haploid loci}
 
 \item{\code{haplotypes}}{the enumeration of haplotypes}
+
+\item{\code{IDgenome}}{ID of the associated genome}
 }}
 
 \author{

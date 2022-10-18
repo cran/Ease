@@ -7,20 +7,20 @@
 catn(..., file = "", sep = " ", fill = FALSE, labels = NULL, append = FALSE)
 }
 \arguments{
-\item{...}{See \link[base]{cat}.}
+\item{...}{see \link[base]{cat}.}
 
-\item{file}{See \link[base]{cat}.}
+\item{file}{see \link[base]{cat}.}
 
-\item{sep}{See \link[base]{cat}.}
+\item{sep}{see \link[base]{cat}.}
 
-\item{fill}{See \link[base]{cat}.}
+\item{fill}{see \link[base]{cat}.}
 
-\item{labels}{See \link[base]{cat}.}
+\item{labels}{see \link[base]{cat}.}
 
-\item{append}{See \link[base]{cat}.}
+\item{append}{see \link[base]{cat}.}
 }
 \value{
-None (invisible NULL).
+None (invisible \code{NULL}).
 }
 \description{
 Object output in the same way as the function \link[base]{cat} but adding

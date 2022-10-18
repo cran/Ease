@@ -53,9 +53,9 @@ hand, the recombination rate of 0.5 between the second and third loci
 ensures that the two groups are independent.
 }
 \examples{
-LD <- list(dl = as.factor(c("A", "a")))
-HL <- list(hl = as.factor(c("B", "b")))
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+DL <- list(dl = c("A", "a"))
+HL <- list(hl = c("B", "b"))
+genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 
 }
 \author{

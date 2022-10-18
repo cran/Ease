@@ -7,9 +7,9 @@
 IDhaplotypeGeneration(dl, hl)
 }
 \arguments{
-\item{dl}{character (or factors) vector. The diploid haplotype}
+\item{dl}{the diploid haplotype as a character (or factors) vector.}
 
-\item{hl}{character (or factors) vector. The haploid haplotype}
+\item{hl}{the haploid haplotype as a character (or factors) vector.}
 }
 \value{
 The haplotype ID as a character string.

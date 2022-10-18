@@ -31,26 +31,26 @@ haplotype is associated with a fitness value).
 \examples{
 ### Example with two loci, each with two alleles ###
 # Definition of the diploid locus
-LD <- list(dl = as.factor(c("A", "a")))
+DL <- list(dl = c("A", "a"))
 # Definition of the haploid locus
-HL <- list(hl = as.factor(c("B", "b")))
+HL <- list(hl = c("B", "b"))
 # Definition of the object of Genome class
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 genomeObj
 
 ### Exemple with more diploid loci ###
 # Definition of the diploid loci
-LD <- list(
-  dl1 = as.factor(c("A", "a")),
-  dl2 = as.factor(c("B", "b")),
-  dl3 = as.factor(c("C", "c"))
+DL <- list(
+  dl1 = c("A", "a"),
+  dl2 = c("B", "b"),
+  dl3 = c("C", "c")
 )
 # Definition of the haploid locus
-HL <- list(hl = as.factor(c("D", "d")))
+HL <- list(hl = c("D", "d"))
 # Definition of the object of Genome class, with in addition the necessary
 # definition of recombination rates between loci:
 genomeObj <- setGenome(
-  listHapLoci = HL, listDipLoci = LD,
+  listHapLoci = HL, listDipLoci = DL,
   recRate = c(0.1, 0.5)
 )
 # Here we have a 0.1 recombination rate between dl1 and dl2 and a 0.5

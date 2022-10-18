@@ -4,29 +4,22 @@
 \alias{setMutationMatrix}
 \title{Setting the mutation matrix}
 \usage{
-setMutationMatrix(genomeObj, mutHapLoci, mutDipLoci)
+setMutationMatrix(genomeObj, ...)
 }
 \arguments{
 \item{genomeObj}{a \code{Genome} object}
 
-\item{mutHapLoci}{a list of haploid locus by locus allelic mulation matrices.}
-
-\item{mutDipLoci}{a list of diploid locus by locus allelic mulation matrices.}
+\item{...}{see details.}
 }
 \value{
 a \code{MutationMatrix} object
 }
 \description{
-Generation of the mutation matrix associated with the genome given as input
-and specifying the mutation matrices locus by locus by the arguments
-\code{mutHapLoci} and \code{mutDipLoci}.
-}
-\details{
+Generation of the mutation matrix associated with the genome given as input.
 A mutation matrix is used to simulate mutations that affect loci. An object
 of the class \code{MutationMatrix} does not only contain a (genotypic)
 mutation matrix. It also contains the attributes necessary for the
 construction and easy-to-read display of this matrix.
-
 The mutation matrix itself is a square matrix of size equal to the number of
 genotypes. It is a probability matrix in that the sum of the values in
 each row is equal to 1. For a given genotype, the row associated with it
@@ -34,19 +27,61 @@ describes the probabilistic proportions that lead by mutation of this
 genotype to the production of the other genotypes (and of itself if there
 are no mutations).
 }
+\details{
+There are three ways to define the mutation matrix associated with a
+\code{Genome} class object.
+
+1) By giving two lists of allelic mutation matrices \code{mutHapLoci} and
+\code{mutDipLoci}, for haploid and diploid loci respectively. Each of
+these lists contains as many matrices as there are loci. These matrices
+are transition matrices (squares, with the sum of the rows equal to 1)
+of size equal to the number of alleles at the locus concerned.
+
+2) By giving a forward and a backward allelic mutation rate
+(\code{forwardMut} and \code{backwardMut} respectively). The generated
+mutation matrices will thus be defined with the same rates for all loci. A
+forward mutation rate means that the transition from one allele to another
+is done in the order in which they were defined when the Genome class object
+was created, and in the other direction for the backward rate.
+
+3) By giving a list of \code{mutations} generated through the
+\link[Ease]{mutation} function.
+}
 \examples{
 ### Example with two loci, each with two alleles ###
-# Definition of the diploid locus
-LD <- list(dl = as.factor(c("A", "a")))
-# Definition of the haploid locus
-HL <- list(hl = as.factor(c("B", "b")))
-# Definition of the object of Genome class
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-# The mutation matrices can be defined as follows:
-mutHapLoci <- list(matrix(c(0.9, 0.1, 0.1, 0.9), 2))
+
+# Definition of the genome
+DL <- list(dl = c("A", "a"))
+HL <- list(hl = c("B", "b"))
+genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
+
+# Three ways to define the same mutation matrix associated with the
+# genome defined above:
+
+# 1) Mutation matrix from matrices
+mutHapLoci <- list(matrix(c(0.99, 0.01, 0.01, 0.99), 2))
 mutDipLoci <- list(matrix(c(0.99, 0.01, 0.01, 0.99), 2))
 # One can then define the MutationMatrix class object:
-setMutationMatrix(genomeObj, mutHapLoci, mutDipLoci)
+setMutationMatrix(genomeObj,
+  mutHapLoci = mutHapLoci,
+  mutDipLoci = mutDipLoci
+)
+
+# 2) Mutation matrix from mutation rates
+mutMatrixObj <- setMutationMatrix(genomeObj, forwardMut = 0.1)
+# or by adding a backward mutation rate:
+mutMatrixObj <- setMutationMatrix(genomeObj,
+  forwardMut = 1e-3,
+  backwardMut = 1e-4
+)
+
+# 3) Mutation matrix from single mutation definition
+mutMatrixObj <- setMutationMatrix(genomeObj,
+  mutations = list(
+    mutation(from = "A", to = "a", rate = 0.1),
+    mutation(from = "B", to = "b", rate = 0.1)
+  )
+)
 
 }
 \author{

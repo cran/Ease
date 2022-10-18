@@ -20,27 +20,23 @@ haplotype is associated with a fitness value).
 \section{Slots}{
 
 \describe{
+\item{\code{genome}}{a \code{Genome} object}
+
 \item{\code{IDhaplotypes}}{IDs of haplotypes}
 
 \item{\code{IDgenotypes}}{IDs of genotypes}
+
+\item{\code{IDgenome}}{ID of the associated genome}
 
 \item{\code{nbHaplo}}{the number of haplotypes}
 
 \item{\code{nbGeno}}{the number of genotypes}
 
-\item{\code{femgamFit}}{the vector of female's gamete fitness}
+\item{\code{gamFit}}{the list of gametes' fitness}
 
-\item{\code{malegamFit}}{the vector of male's gamete fitness}
+\item{\code{indFit}}{the list of individuals' fitness}
 
-\item{\code{femindFit}}{the vector of female's individual fitness}
-
-\item{\code{maleindFit}}{the vector of male's individual fitness}
-
-\item{\code{indFit}}{the vector of individual fitness (in case of hermaphrodites)}
-
-\item{\code{femProdFit}}{the vector of female's gamete production fitness}
-
-\item{\code{maleProdFit}}{the vector of male's gamete production fitness}
+\item{\code{gamProdFit}}{the list of gamete production fitness}
 
 \item{\code{sOnInds}}{a logical indicating whether a selection on individuals
 has been configured by the user}

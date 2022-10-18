@@ -16,7 +16,7 @@
 check.genome <- function(object) {
 
   # Checking the allele enumeration vector
-  if (any(unlist(lapply(object@listHapLoci, class)) != "factor")) {
+  if (any(!sapply(object@listHapLoci, inherits, what = "factor"))) {
     stop(paste(
       "The enumeration list of the alleles of the loci must be",
       "a list of loci where each of them is associated with a",
@@ -24,7 +24,7 @@ check.genome <- function(object) {
       "alleles."
     ))
   }
-  if (any(unlist(lapply(object@listDipLoci, class)) != "factor")) {
+  if (any(!sapply(object@listDipLoci, inherits, what = "factor"))) {
     stop(paste(
       "The enumeration list of the alleles of the loci must be",
       "a list of loci where each of them is associated with a",
@@ -121,20 +121,7 @@ check.genome <- function(object) {
 #' @slot genotypes the list of genotypes
 #' @slot nbGeno the number of genotypes
 #' @slot IDgenotypes IDs of genotypes
-#'
-#' @examples
-#' # Definition of loci:
-#' LD <- list(dl = as.factor(c("A", "a")))
-#' HL <- list(hl = as.factor(c("B", "b")))
-#'
-#' # Creation of the object:
-#' genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-#'
-#' # Showing:
-#' genomeObj
-#'
-#' # Printing:
-#' print(genomeObj)
+#' @slot IDgenome ID of the genome
 #'
 #' @author Ehouarn Le Faou
 #'
@@ -157,7 +144,8 @@ setClass("Genome",
     IDhaplotypes = "character",
     genotypes = "list",
     nbGeno = "numeric",
-    IDgenotypes = "character"
+    IDgenotypes = "character",
+    IDgenome = "character"
   ),
   validity = check.genome
 )
@@ -253,6 +241,9 @@ setMethod("initialize", "Genome", function(.Object, listHapLoci, listDipLoci,
     }
   )
 
+  # Identification of the genome
+  .Object@IDgenome <- IDgenomeGeneration(.Object@listLoci, .Object@alleles)
+
   return(.Object)
 })
 
@@ -330,6 +321,14 @@ setMethod("print", "Genome", function(x, ...) {
     cat(listing(x@listDipLoci[[i]]))
     catn(" alleles")
   }
+  catn()
+  catn(" #  ", x@nbAlleles, " alleles:")
+  print(paste("  ", paste(1:x@nbAlleles, ")", sep = ""),
+    x@alleles,
+    sep = " "
+  ),
+  quote = FALSE, row.names = FALSE
+  )
   catn()
   catn(" #  ", x@nbHaplo, " haplotypes:")
   print(paste("  ", paste(1:x@nbHaplo, ")", sep = ""),

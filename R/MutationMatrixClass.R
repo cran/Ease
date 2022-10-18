@@ -2,8 +2,6 @@
 #                             MutationMatrix CLASS                             #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-## Validity check ----
-
 # The MutationMatrix class is a class that converts allelic mutation matrices
 # into a haplotypic mutation matrix and checks whether the input allelic
 # mutation matrices are compatible with an object of class 'genome'.
@@ -11,64 +9,7 @@
 # need to have these allelic mutation matrices as input, which must therefore
 # be verified.
 
-#' Test if a matrix is of probability
-#'
-#' @param x a matrix.
-#'
-#' @return A logical corresponding to whether \code{x} is a probability
-#' matrix (sum of rows equal to 1).
-#'
-#' @author Ehouarn Le Faou
-#'
-is.probability.matrix <- function(x) {
-  rowSum <- apply(x, 1, sum)
-  if (any(rowSum != 1)) {
-    return(FALSE)
-  }
-  return(TRUE)
-}
-
-#' Test if a matrix is a default matrix
-#'
-#' @param x a matrix.
-#'
-#' @return A logical corresponding to whether \code{x} is a default matrix
-#' (matrix of dimension 0x0).
-#'
-#' @author Ehouarn Le Faou
-#'
-is.default.matrix <- function(x) {
-  return(nrow(x) == 0 & ncol(x) == 0)
-}
-
-#' Test if a matrix is a correct mutation matrix
-#'
-#' @param x a matrix.
-#' @param name the name of the matrix
-#'
-#' @return A logical corresponding to whether \code{x} is a correct mutation
-#' matrix, i.e. a square matrix with dimensions greater than 0 and whose rows
-#' sum to 1.
-#'
-#' @author Ehouarn Le Faou
-#'
-is.correct.mut.matrix <- function(x, name) {
-  if (!is.default.matrix(x)) { # Not default matrix ?
-    if (nrow(x) == ncol(x)) { # Square matrix ?
-      if (!is.probability.matrix(x)) { # Is it a probability matrix ?
-        stop(paste0(
-          "The (or one of the) mutation matrix(ces) in '", name,
-          "' given as input is not a probability matrix"
-        ))
-      }
-    } else {
-      stop(paste0(
-        "The (or one of the) mutation matrix(ces) in '", name,
-        "' given as input is not square."
-      ))
-    }
-  }
-}
+## Validity check ----
 
 #' The validity check associated with the \code{MutationMatrix} class
 #'
@@ -81,10 +22,10 @@ is.correct.mut.matrix <- function(x, name) {
 #'
 check.mutationMatrix <- function(object) {
   for (i in 1:length(object@mutHapLoci)) {
-    is.correct.mut.matrix(object@mutHapLoci[[i]], "hapLoci")
+    is.correct.transition.matrix(object@mutHapLoci[[i]], "mutation", "hapLoci")
   }
   for (i in 1:length(object@mutDipLoci)) {
-    is.correct.mut.matrix(object@mutDipLoci[[i]], "dipLoci")
+    is.correct.transition.matrix(object@mutDipLoci[[i]], "mutation", "dipLoci")
   }
   if (length(object@mutHapLoci) != object@nbHL) {
     stop(paste(
@@ -135,6 +76,7 @@ check.mutationMatrix <- function(object) {
 #' @slot nbDL the number of diploid loci
 #' @slot nbHL the number of haploid loci
 #' @slot haplotypes the enumeration of haplotypes
+#' @slot IDgenome ID of the associated genome
 #'
 #' @author Ehouarn Le Faou
 #'
@@ -150,7 +92,8 @@ setClass("MutationMatrix",
     nbHaplo = "numeric",
     nbDL = "numeric",
     nbHL = "numeric",
-    haplotypes = "list"
+    haplotypes = "list",
+    IDgenome = "character"
   ),
   validity = check.mutationMatrix
 )
@@ -181,6 +124,7 @@ setMethod("initialize", "MutationMatrix", function(.Object, genomeObj,
   .Object@nbHaplo <- genomeObj@nbHaplo
   .Object@nbDL <- genomeObj@nbDL
   .Object@nbHL <- genomeObj@nbHL
+  .Object@IDgenome <- genomeObj@IDgenome
 
   # Validity of the object
   validObject(.Object)

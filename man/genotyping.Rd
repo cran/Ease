@@ -7,7 +7,7 @@
 genotyping(genomeObj)
 }
 \arguments{
-\item{genomeObj}{a \code{Genome} object}
+\item{genomeObj}{a \code{Genome} object.}
 }
 \value{
 A list of matrices describing genotypes in rows.

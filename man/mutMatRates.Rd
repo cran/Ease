@@ -7,12 +7,11 @@
 mutMatRates(alleles, forwardMut, backwardMut)
 }
 \arguments{
-\item{alleles}{character (or factors) vector. Allele enumeration vector of a
-locus}
+\item{alleles}{allele enumeration vector of a locus}
 
-\item{forwardMut}{numeric. Forward mutation rate}
+\item{forwardMut}{forward mutation rate}
 
-\item{backwardMut}{numeric. Backward mutation rate}
+\item{backwardMut}{backward mutation rate}
 }
 \value{
 An allelic mutation matrix (probability matrix which associates to

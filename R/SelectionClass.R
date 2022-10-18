@@ -14,11 +14,11 @@
 #' @author Ehouarn Le Faou
 #'
 check.selection <- function(object) {
-  lenVectsGeno <- list(
-    object@femindFit, object@maleindFit, object@indFit,
-    object@femProdFit, object@maleProdFit
+  lenVectsGeno <- c(
+    object@indFit,
+    object@gamProdFit
   )
-  lenVectsHaplo <- list(object@femgamFit, object@malegamFit)
+  lenVectsHaplo <- object@gamFit
   if (any(sapply(lenVectsGeno, length) != object@nbGeno)) {
     stop(paste(
       "All selection vectors that apply to individuals (directly or",
@@ -35,6 +35,7 @@ check.selection <- function(object) {
   return(TRUE)
 }
 
+
 ## Class definition ----
 
 #' \code{Selection} class
@@ -50,17 +51,15 @@ check.selection <- function(object) {
 #' is associated with a fitness value) and haplotypic in the third (each
 #' haplotype is associated with a fitness value).
 #'
+#' @slot genome a \code{Genome} object
 #' @slot IDhaplotypes IDs of haplotypes
 #' @slot IDgenotypes IDs of genotypes
+#' @slot IDgenome ID of the associated genome
 #' @slot nbHaplo the number of haplotypes
 #' @slot nbGeno the number of genotypes
-#' @slot femgamFit the vector of female's gamete fitness
-#' @slot malegamFit the vector of male's gamete fitness
-#' @slot femindFit the vector of female's individual fitness
-#' @slot maleindFit the vector of male's individual fitness
-#' @slot indFit the vector of individual fitness (in case of hermaphrodites)
-#' @slot femProdFit  the vector of female's gamete production fitness
-#' @slot maleProdFit  the vector of male's gamete production fitness
+#' @slot gamFit the list of gametes' fitness
+#' @slot indFit the list of individuals' fitness
+#' @slot gamProdFit the list of gamete production fitness
 #' @slot sOnInds a logical indicating whether a selection on individuals
 #' has been configured by the user
 #' @slot sOnGams a logical indicating whether a selection on gametes
@@ -73,17 +72,15 @@ check.selection <- function(object) {
 #' @export
 setClass("Selection",
   representation(
+    genome = "Genome",
     IDhaplotypes = "character",
     IDgenotypes = "character",
+    IDgenome = "character",
     nbHaplo = "numeric",
     nbGeno = "numeric",
-    femgamFit = "numeric",
-    malegamFit = "numeric",
-    femindFit = "numeric",
-    maleindFit = "numeric",
-    indFit = "numeric",
-    femProdFit = "numeric",
-    maleProdFit = "numeric",
+    gamFit = "list",
+    indFit = "list",
+    gamProdFit = "list",
     sOnInds = "logical",
     sOnGams = "logical",
     sOnGamsProd = "logical"
@@ -103,26 +100,33 @@ setClass("Selection",
 #' @author Ehouarn Le Faou
 #'
 setMethod("initialize", "Selection", function(.Object, genomeObj) {
+  .Object@genome <- genomeObj
   .Object@IDhaplotypes <- genomeObj@IDhaplotypes
   .Object@IDgenotypes <- genomeObj@IDgenotypes
   .Object@nbHaplo <- genomeObj@nbHaplo
   .Object@nbGeno <- genomeObj@nbGeno
+  .Object@IDgenome <- genomeObj@IDgenome
 
-  .Object@femgamFit <- rep(1, genomeObj@nbHaplo)
-  .Object@malegamFit <- rep(1, genomeObj@nbHaplo)
-  .Object@femindFit <- rep(1, genomeObj@nbGeno)
-  .Object@maleindFit <- rep(1, genomeObj@nbGeno)
-  .Object@indFit <- rep(1, genomeObj@nbGeno)
-  .Object@femProdFit <- rep(1, genomeObj@nbGeno)
-  .Object@maleProdFit <- rep(1, genomeObj@nbGeno)
-
-  names(.Object@femgamFit) <- genomeObj@IDhaplotypes
-  names(.Object@malegamFit) <- genomeObj@IDhaplotypes
-  names(.Object@femindFit) <- genomeObj@IDgenotypes
-  names(.Object@maleindFit) <- genomeObj@IDgenotypes
-  names(.Object@indFit) <- genomeObj@IDgenotypes
-  names(.Object@femProdFit) <- genomeObj@IDgenotypes
-  names(.Object@maleProdFit) <- genomeObj@IDgenotypes
+  .Object@gamFit <- list(
+    female = rep(1, genomeObj@nbHaplo),
+    male = rep(1, genomeObj@nbHaplo)
+  )
+  names(.Object@gamFit$female) <- genomeObj@IDhaplotypes
+  names(.Object@gamFit$male) <- genomeObj@IDhaplotypes
+  .Object@indFit <- list(
+    ind = rep(1, genomeObj@nbGeno),
+    female = rep(1, genomeObj@nbGeno),
+    male = rep(1, genomeObj@nbGeno)
+  )
+  names(.Object@indFit$ind) <- genomeObj@IDgenotypes
+  names(.Object@indFit$female) <- genomeObj@IDgenotypes
+  names(.Object@indFit$male) <- genomeObj@IDgenotypes
+  .Object@gamProdFit <- list(
+    female = rep(1, genomeObj@nbGeno),
+    male = rep(1, genomeObj@nbGeno)
+  )
+  names(.Object@gamProdFit$female) <- genomeObj@IDgenotypes
+  names(.Object@gamProdFit$male) <- genomeObj@IDgenotypes
 
   .Object@sOnInds <- FALSE
   .Object@sOnGams <- FALSE
@@ -131,6 +135,7 @@ setMethod("initialize", "Selection", function(.Object, genomeObj) {
 
   return(.Object)
 })
+
 
 ## Show method ----
 
@@ -176,21 +181,21 @@ setMethod("print", "Selection", function(x, ...) {
     catn()
   }
   if (x@sOnInds) {
-    tbp <- cbind(t(t(x@indFit)), t(t(x@femindFit)), t(t(x@maleindFit)))
+    tbp <- cbind(t(t(x@indFit[["ind"]])), t(t(x@indFit[["female"]])), t(t(x@indFit[["male"]])))
     colnames(tbp) <- c("Individuals", "Female", "Male")
     print(tbp)
     catn()
   }
   if (x@sOnGams) {
     catn(" #  On gametes: ")
-    tbp <- cbind(t(t(x@femgamFit)), t(t(x@malegamFit)))
+    tbp <- cbind(t(t(x@gamFit[["female"]])), t(t(x@gamFit[["male"]])))
     colnames(tbp) <- c("Female gamete", "Male gamete")
     print(tbp)
     catn()
   }
   if (x@sOnGamsProd) {
     catn(" #  On gamete production: ")
-    tbp <- cbind(t(t(x@femProdFit)), t(t(x@maleProdFit)))
+    tbp <- cbind(t(t(x@gamProdFit[["female"]])), t(t(x@gamProdFit[["male"]])))
     colnames(tbp) <- c("Female gamete", "Male gamete")
     print(tbp)
     catn()

@@ -2,15 +2,39 @@
 #                               MODEL FUNCTIONS                                #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
+## Genome, Geno- and Haplotypes ----
+
+### Identifiers ----
+
+#' Genome identifier
+#'
+#' Generation of the input genome ID, i.e. the concatenation in string form
+#' of the names of the loci and alleles constituting this genome.
+#'
+#' @param listLoci the list of all loci
+#' @param alleles the vector of all the alleles
+#'
+#' @return The genome ID as a character string.
+#'
+#' @author Ehouarn Le Faou
+#'
+IDgenomeGeneration <- function(listLoci, alleles) {
+  IDlist <- unlist(lapply(listLoci, length))
+  IDvect <- paste(rep(names(IDlist), IDlist), alleles, sep = ":")
+  return(Reduce(function(x, y) {
+    paste(x, y, sep = "/")
+  }, IDvect))
+}
+
 #' Genotype identifier
 #'
 #' Generation of the input genotype ID, i.e. the concatenation in string form
 #' of the names of the alleles constituting these haplotypes (the two from
 #' the diploid genome and the one from the haploid genome).
 #'
-#' @param dl1 character (or factors) vector. The first diploid haplotype
-#' @param dl2 character (or factors) vector. the second diploid haplotype
-#' @param hl character (or factors) vector. the haploid haplotype
+#' @param dl1 the first diploid haplotype as a character (or factors) vector.
+#' @param dl2 the second diploid haplotype as a character (or factors) vector.
+#' @param hl the haploid haplotype as a character (or factors) vector.
 #'
 #' @return The genotype ID as a character string.
 #'
@@ -38,8 +62,8 @@ IDgenotypeGeneration <- function(dl1, dl2, hl = NULL) {
 #' Generation of the input haplotype ID, i.e. the concatenation in string form
 #' of the names of the alleles constituting this haplotype.
 #'
-#' @param dl character (or factors) vector. The diploid haplotype
-#' @param hl character (or factors) vector. The haploid haplotype
+#' @param dl the diploid haplotype as a character (or factors) vector.
+#' @param hl the haploid haplotype as a character (or factors) vector.
 #'
 #' @return The haplotype ID as a character string.
 #'
@@ -52,6 +76,7 @@ IDhaplotypeGeneration <- function(dl, hl) {
   return(as.character(paste0(haploStr[[1]], "||", haploStr[[2]])))
 }
 
+### Generation ----
 
 #' Haplotyping
 #'
@@ -108,8 +133,6 @@ haplotyping <- function(genomeObj) {
   ))
 }
 
-
-
 #' Genotyping
 #'
 #' Generation of genotypes associated with a \code{Genome} object.
@@ -119,7 +142,7 @@ haplotyping <- function(genomeObj) {
 #' and one haploid haplotype (third matrix), which are read at the
 #' same row number on all three matrices.
 #'
-#' @param genomeObj a \code{Genome} object
+#' @param genomeObj a \code{Genome} object.
 #'
 #' @return A list of matrices describing genotypes in rows.
 #'
@@ -197,6 +220,7 @@ genotyping <- function(genomeObj) {
 }
 
 
+## Mutation matrix ----
 
 #' Mutation matrix from rates
 #'
@@ -205,10 +229,9 @@ genotyping <- function(genomeObj) {
 #'
 #' See \code{MutationMatrix} for more details on mutation matrices.
 #'
-#' @param alleles character (or factors) vector. Allele enumeration vector of a
-#' locus
-#' @param forwardMut numeric. Forward mutation rate
-#' @param backwardMut numeric. Backward mutation rate
+#' @param alleles allele enumeration vector of a locus
+#' @param forwardMut forward mutation rate
+#' @param backwardMut backward mutation rate
 #'
 #' @return An allelic mutation matrix (probability matrix which associates to
 #' each allele in a row the probability of mutating or not to the other alleles
@@ -237,6 +260,88 @@ mutMatRates <- function(alleles, forwardMut, backwardMut) {
   }
 }
 
+
+#' Individual mutation definition to allelic mutation matrices
+#'
+#' Translation of the list of individually defined mutations into allelic
+#' mutation matrices which are then used to generate the genotypic mutation
+#' matrix.
+#'
+#' @param genomeObj a \code{Genome} object
+#' @param mutations list of mutations defined individually with the function
+#' \link[Ease]{mutation}
+#'
+#' @return A list of the two list of allelic mutation matrices, for haploid
+#' and diploid loci respectively.
+#'
+#' @author Ehouarn Le Faou
+#'
+mutMatFriendly <- function(genomeObj, mutations) {
+
+  # Blank matrices definition
+  mutHapLoci <- lapply(genomeObj@listHapLoci, function(alleles) {
+    mutMatRates(alleles, 0, 0)
+  })
+  mutDipLoci <- lapply(genomeObj@listDipLoci, function(alleles) {
+    mutMatRates(alleles, 0, 0)
+  })
+
+  # Naming
+  for (i in 1:genomeObj@nbHL) {
+    colnames(mutHapLoci[[i]]) <- genomeObj@listHapLoci[[i]]
+    rownames(mutHapLoci[[i]]) <- genomeObj@listHapLoci[[i]]
+  }
+  for (i in 1:genomeObj@nbDL) {
+    colnames(mutDipLoci[[i]]) <- genomeObj@listDipLoci[[i]]
+    rownames(mutDipLoci[[i]]) <- genomeObj@listDipLoci[[i]]
+  }
+
+  # Translation of mutations in matrices
+  for (mut in mutations) {
+    fromHapLoci <- unlist(lapply(genomeObj@listHapLoci, function(x) mut[["from"]] %in% x))
+    fromDipLoci <- unlist(lapply(genomeObj@listDipLoci, function(x) mut[["from"]] %in% x))
+
+    toHapLoci <- unlist(lapply(genomeObj@listHapLoci, function(x) mut[["to"]] %in% x))
+    toDipLoci <- unlist(lapply(genomeObj@listDipLoci, function(x) mut[["to"]] %in% x))
+
+    comparison <- which(c(fromHapLoci, fromDipLoci) & c(toHapLoci, toDipLoci))
+
+    if (length(comparison) == 0) {
+      stop(paste(
+        "In particular, check that the mutations defined are between",
+        "alleles of the same loci, and that the names of the alleles",
+        "are correct."
+      ))
+    } else if (length(comparison) > 1) {
+      stop(paste("Ambiguous input."))
+    }
+
+    if (names(comparison) %in% names(genomeObj@listHapLoci)) {
+      indexLoci <- which(fromHapLoci & toHapLoci)
+      indexFrom <- which(genomeObj@listHapLoci[[indexLoci]] == mut$from)
+      indexTo <- which(genomeObj@listHapLoci[[indexLoci]] == mut$to)
+      mutHapLoci[[indexLoci]][indexFrom, indexTo] <- mut$rate
+    } else {
+      indexLoci <- which(fromDipLoci & toDipLoci)
+      indexFrom <- which(genomeObj@listDipLoci[[indexLoci]] == mut$from)
+      indexTo <- which(genomeObj@listDipLoci[[indexLoci]] == mut$to)
+      mutDipLoci[[indexLoci]][indexFrom, indexTo] <- mut$rate
+    }
+  }
+  # Generation of diagonal values
+  for (i in seq_len(length(mutHapLoci))) {
+    diag(mutHapLoci[[i]]) <- 0
+    diag(mutHapLoci[[i]]) <- 1 - apply(mutHapLoci[[i]], 1, sum)
+  }
+  for (i in seq_len(length(mutDipLoci))) {
+    diag(mutDipLoci[[i]]) <- 0
+    diag(mutDipLoci[[i]]) <- 1 - apply(mutDipLoci[[i]], 1, sum)
+  }
+  return(list(mutHapLoci = mutHapLoci, mutDipLoci = mutDipLoci))
+}
+
+
+## Other matrices ----
 
 #' Recombination matrix generation
 #'
@@ -449,4 +554,328 @@ alleleFreqMatGeneration <- function(genomeObj) {
   colnames(alleleFreqMat) <- genomeObj@alleles
   rownames(alleleFreqMat) <- genomeObj@IDgenotypes
   return(alleleFreqMat)
+}
+
+
+
+## Selection formulas handling ----
+
+#' Extract the allele combination
+#'
+#' Conversion of an allelic combination defined in a selection formula into the
+#' vector listing the alleles present (alleles that must be in the homozygous
+#' state appear 2 times, 1 time for heterozygous).
+#'
+#' @param xVect allelic combination extracted from a selection formula.
+#'
+#' @return the list of alleles that must be present in the genotype to match
+#' the input allelic combination
+#'
+#' @author Ehouarn Le Faou
+#'
+extractAlleleComb <- function(xVect) {
+  yVect <- c()
+  for (x in xVect) {
+    y <- gsub("h", "", x)
+    y <- gsub("\\(|\\)", "", y)
+    if (identical(x, y)) {
+      yVect <- c(yVect, x)
+    } else {
+      yVect <- c(yVect, rep(y, 2))
+    }
+  }
+  return(yVect)
+}
+
+
+#' Treatment of a selection formula
+#'
+#' Conversion of the factors of a selection formula into the list of
+#' corresponding allelic combinations
+#'
+#' @param factors formula factors (right-hand members)
+#' @param genomeObj a \code{Genome} object for the test (see \code{checking}
+#' parameter)
+#' @param checking logical indicating whether a test verifying the
+#' compatibility of input factors with the genome
+#'
+#' @return A list of vectors enumerating the allelic combinations that
+#' correspond to the factors
+#'
+#' @author Ehouarn Le Faou
+#'
+selection.form.treatment <- function(factors, genomeObj = NULL, checking = FALSE) {
+  # Treatment of the factors
+  allAlleleCombsRaw <- colnames(factors)
+  alleleCombRaw <- sapply(allAlleleCombsRaw, strsplit, split = ":")
+  alleleCombList <- lapply(alleleCombRaw, extractAlleleComb)
+
+  if (checking) {
+    # Checking the validity of the expression
+    test <- length(union(unlist(alleleCombList), genomeObj@alleles)) ==
+      genomeObj@nbAlleles
+    if (!test) {
+      stop(paste(
+        "At least one of the selection definition formulas is not",
+        "correctly defined."
+      ))
+    }
+  }
+  return(alleleCombList)
+}
+
+
+#' Is this haplo/geno-type affected ?
+#'
+#' Determination for a given genotype or haplotype whether it
+#' contains the allelic combination under selection
+#'
+#' @param refDNAtype the reference allelic combination (that of a genotype or a
+#' haplotype
+#' @param selDNAtype the selected allelic combination
+#'
+#' @return a logic indicating whether the reference genotype or haplotype
+#' is affected by the allelic combination under selection
+#'
+#' @author Ehouarn Le Faou
+#'
+isAffected <- function(refDNAtype, selDNAtype) {
+  test <- TRUE
+  for (i in seq_len(length(selDNAtype))) {
+    a <- selDNAtype[i]
+    id <- which(names(refDNAtype) == names(a))
+    if (!identical(id, integer(0))) {
+      if (!(refDNAtype[id] == a)) {
+        test <- FALSE
+      }
+    } else {
+      test <- FALSE
+    }
+  }
+  return(test)
+}
+
+#' Which alleles are homozygous in the input?
+#'
+#' Determine which alleles are at least once input as homozygous in the formula.
+#'
+#' @param formula a selection formula
+#'
+#' @return the enumeration of alleles that appear at least once homozygous
+#'
+#' @author Ehouarn Le Faou
+#'
+#' @import stats
+whichHomoz <- function(formula) {
+  fact <- attr(terms(formula), which = "factors")
+  alleleComb <- selection.form.treatment(fact)
+  countFact <- lapply(alleleComb, table)
+  countFactVect <- lapply(countFact, function(x) {
+    vect <- as.vector(x)
+    names(vect) <- names(x)
+    vect
+  })
+  names(countFactVect) <- NULL
+  allCountFact <- unlist(countFactVect)
+  homozAlleleOccur <- unique(names(allCountFact)[allCountFact == 2])
+  return(homozAlleleOccur)
+}
+
+#' Are there any allelic combinations including homozygosity
+#'
+#' Test if there are homozygotes in the specified allelic combinations of
+#' a selection formula
+#'
+#' @param formula a selection formula
+#'
+#' @return logical indicating if there are homozygotes
+#'
+#' @author Ehouarn Le Faou
+#'
+areThereHomoz <- function(formula) {
+  return(!identical(whichHomoz(formula), character(0)))
+}
+
+#' Are there any allelic combinations including homozygosity
+#'
+#' Test if there are homozygotes in the specified allelic combinations of
+#' a list of selection formulas
+#'
+#' @param selectFormula a list of selection formula
+#'
+#' @return logical indicating if there are homozygotes
+#'
+isHaploSelectFormula <- function(selectFormula) {
+  return(!any(unlist(lapply(selectFormula, areThereHomoz))))
+}
+
+
+
+#' Conversion of selection formulas
+#'
+#' Conversion of a list of selection formulas into a genotypic (or haplotypic)
+#' fitness vector associated with a \code{Genome} object.
+#'
+#' @param selectFormula a list of selection formulas
+#' @param genomeObj a \code{Genome} object
+#' @param haplo logical indicating whether the selection should apply to
+#' haplotypes (in the case of gametic selection for example)
+#'
+#' @return a vector of fitness values
+#'
+#' @author Ehouarn Le Faou
+#'
+#' @import stats
+selectFormIntoVect <- function(selectFormula, genomeObj, haplo = FALSE) {
+  if (haplo) {
+    if (!isHaploSelectFormula(selectFormula)) {
+      stop(paste(
+        "Selection formulas are not compatible with the definition",
+        "of fitness for haplotypes (they include homozygous",
+        "allelic combinations)"
+      ))
+    }
+    nbDNAtype <- genomeObj@nbHaplo
+    DNAtype <- genomeObj@haplotypes
+  } else {
+    nbDNAtype <- genomeObj@nbGeno
+    DNAtype <- genomeObj@genotypes
+  }
+
+  haploidAlleles <- unlist(genomeObj@listHapLoci)
+  homozAllelesForm <- unlist(lapply(selectFormula, whichHomoz))
+
+  if (any(haploidAlleles %in% homozAllelesForm)) {
+    stop(paste(
+      "The alleles of the haploid loci cannot be homozygous in",
+      "the selection formulas."
+    ))
+  }
+
+
+  # Converting the list of selection formulas into the selection list
+  listSelect <- list()
+  for (formula in selectFormula) {
+    factors <- attr(terms(formula), which = "factors")
+    listSelect <- c(listSelect, list(list(
+      alleleComb = selection.form.treatment(factors, genomeObj, checking = TRUE),
+      fitnessEffect = eval(parse(text = rownames(factors)[1]))
+    )))
+  }
+  names(listSelect) <- NULL
+
+
+  fitTypes <- c()
+  for (i in seq_len(nbDNAtype)) {
+    DNAtypeAlleles <- as.character(
+      unlist(lapply(DNAtype, function(x) x[i, ]))
+    )
+    fitType <- 1
+    for (select in listSelect) {
+      fit <- select$fitnessEffect
+      for (sel in select$alleleComb) {
+        refDNAtype <- sapply(
+          unique(DNAtypeAlleles),
+          function(x) length(which(DNAtypeAlleles == x))
+        )
+        selDNAtype <- sapply(
+          unique(sel),
+          function(x) length(which(sel == x))
+        )
+
+        if (isAffected(refDNAtype, selDNAtype)) {
+          fitType <- fitType * fit
+        }
+      }
+    }
+    fitTypes <- c(fitTypes, fitType)
+  }
+
+  return(fitTypes)
+}
+
+#' Treatment of selection formulas
+#'
+#' Determines whether an entry for the selection is a list of selection
+#' formulas or just a vector. If it is a list of formulas, turns them
+#' into a vector. If it is a vector, does nothing.
+#'
+#' @param selectInput a selection input
+#' @param genomeObj a \code{Genome} object
+#' @param haplo logical indicating whether the selection should apply to
+#' haplotypes (in the case of gametic selection for example)
+#'
+#' @return a vector of fitness values
+#'
+#' @author Ehouarn Le Faou
+#'
+selectInputTreatment <- function(selectInput, genomeObj, haplo = FALSE) {
+  if (inherits(selectInput, "list")) {
+    if (all(sapply(selectInput, inherits, what = "formula"))) {
+      return(selectFormIntoVect(selectInput, genomeObj, haplo))
+    } else {
+      stop(paste(
+        "The only possible input for the selection is a vector of",
+        "fitness values or a list of selection formulas. "
+      ))
+    }
+  }
+  return(selectInput)
+}
+
+## Results ----
+
+
+#' Custom output function
+#'
+#' Allow to produce a custom output for a simulation.
+#'
+#' This function is called each generation in each population of a simulation
+#' and systematically returns a list with the first element being a logic that
+#' indicates whether something should be saved. If so, the second element
+#' of this list will be saved.
+#'
+#' By default the save nothing function, but it can be changed by the user as
+#' an argument in the \code{simulate} method of the \code{Metapopulation}
+#' class.
+#'
+#' @param pop list of some characteristics of the population :
+#' - customOutput : list of all previous savings
+#' - gen : generation
+#' - freqGeno : list of genotypic frequency matrices (matrix 1 x # genotypes).
+#' The list is constructed as follows: if the population is hermaphroditic it
+#' has only one element "ind", if the population is dioecious it has three
+#' elements, "female", "male" and "ind" which correspond respectively to
+#' the genotypic frequencies of the females, the males and the average of
+#' the two (assuming a sex ratio of 50:50).
+#' - freqHaplo : list of genotypic frequency matrices (matrix 1 x # haplotypes).
+#' The list is constructed in the same way as for genotypic frequencies (see
+#' above).
+#' - freqAlleles : list of allelic frequency matrices (matrix 1 x # alleles).
+#' The list is constructed in the same way as for genotypic frequencies (see
+#' above).
+#'
+#' @author Ehouarn Le Faou
+#'
+#' @export
+outFunct <- function(pop) {
+  return(list(FALSE))
+}
+
+#' Processing a result (or record) list
+#'
+#' @param x list of result or record
+#'
+#' @return Merges the column names of the matrices making up the list with
+#' the names of the matrices, then merges the matrices together.
+#'
+#' @author Ehouarn Le Faou
+#'
+rowResultGen <- function(x) {
+  namesRes <- names(x)
+  x <- sapply(1:length(x), function(i) {
+    colnames(x[[i]]) <- paste0(namesRes[i], colnames(x[[i]]))
+    x[[i]]
+  })
+  return(Reduce(cbind, x))
 }

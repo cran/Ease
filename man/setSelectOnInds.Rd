@@ -37,9 +37,9 @@ to an already existing \code{SelectionObj} object (parameter
 \code{selectionObj}) or by creating one.
 }
 \examples{
-LD <- list(dl = as.factor(c("A", "a")))
-HL <- list(hl = as.factor(c("B", "b")))
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
+DL <- list(dl = c("A", "a"))
+HL <- list(hl = c("B", "b"))
+genomeObj <- setGenome(listHapLoci = HL, listDipLoci = DL)
 selectionObj <- setSelectOnInds(
   genomeObj = genomeObj,
   indFit = c(1, 1, 1, 1, 0.5, 0)

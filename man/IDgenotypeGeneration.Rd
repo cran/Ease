@@ -7,11 +7,11 @@
 IDgenotypeGeneration(dl1, dl2, hl = NULL)
 }
 \arguments{
-\item{dl1}{character (or factors) vector. The first diploid haplotype}
+\item{dl1}{the first diploid haplotype as a character (or factors) vector.}
 
-\item{dl2}{character (or factors) vector. the second diploid haplotype}
+\item{dl2}{the second diploid haplotype as a character (or factors) vector.}
 
-\item{hl}{character (or factors) vector. the haploid haplotype}
+\item{hl}{the haploid haplotype as a character (or factors) vector.}
 }
 \value{
 The genotype ID as a character string.

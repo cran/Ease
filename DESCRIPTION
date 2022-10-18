@@ -1,7 +1,7 @@
 Package: Ease
 Type: Package
 Title: Simulating Explicit Population Genetics Models
-Version: 0.1.0
+Version: 0.1.1
 Author: Ehouarn Le Faou <ehouarnlefaou@orange.fr> [aut, cre]
 Maintainer: Ehouarn Le Faou <ehouarnlefaou@orange.fr>
 Description: Implementation in a simple and efficient way of fully customisable population genetics simulations,
@@ -14,17 +14,16 @@ Description: Implementation in a simple and efficient way of fully customisable 
 	in particular to provide a solution so that these kinds of models can be simulated simply.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Imports: methods, Rcpp (>= 1.0.7), ggplot2, ggpubr, RcppProgress (>=
-        0.1), tidyr
+Imports: methods, Rcpp (>= 1.0.7), RcppProgress (>= 0.1), stats
 LinkingTo: Rcpp, RcppProgress
 RoxygenNote: 7.2.1
 Collate: RcppExports.R ToolFunctions.R ModelFunctions.R GenomeClass.R
-        MutationMatrixClass.R SelectionClass.R EaseClass.R
-        UserFunctions.R
+        MutationMatrixClass.R SelectionClass.R PopulationClass.R
+        MetapopulationClass.R UserFunctions.R
 Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2022-09-15 10:25:26 UTC; ehoua
+Packaged: 2022-10-18 15:36:30 UTC; ehoua
 Repository: CRAN
-Date/Publication: 2022-09-19 08:26:19 UTC
+Date/Publication: 2022-10-18 16:07:53 UTC

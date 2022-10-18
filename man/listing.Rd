@@ -7,7 +7,7 @@
 listing(vect)
 }
 \arguments{
-\item{vect}{a vector of any class}
+\item{vect}{a vector of any class.}
 }
 \value{
 A listing of the elements of the input vector as a string.

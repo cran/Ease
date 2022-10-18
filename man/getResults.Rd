@@ -2,64 +2,28 @@
 % Please edit documentation in R/UserFunctions.R
 \name{getResults}
 \alias{getResults}
-\title{Retrieving simulation results}
+\title{Getting the simulation results}
 \usage{
-getResults(easeObj, asList = FALSE)
+getResults(metapop)
 }
 \arguments{
-\item{easeObj}{an \code{Ease} object}
-
-\item{asList}{logical defining whether the results should be output as a list}
+\item{metapop}{a \code{Metapopulation} objects}
 }
 \value{
-A \code{data.frame} corresponding to the results of the simulations.
-By default, the results are presented in the form of \code{data.frame}, each
-row corresponding to a simulation. The columns correspond, in order, to:
-- the parameters of the simulation: the population size, the generation
-  threshold, the sexual system and finally the self-fertilisation rate (also
-  present in dioecy, but always equal to 0);
-- the genotypic frequencies at the end of the simulation (of females,
-  then males, or only individuals in the case of hermaphrodites)
-- the allelic frequencies at the end of the simulation;
-- the generation at which the simulation stopped;
-- the stop conditions, one column being dedicated to each of them, they
-  indicate by logic if the simulation has reached these stop conditions;
-- the fitness of the individuals at the end of the simulation.
-The parameters \code{includeParams} and \code{includeFitness} of the
-\code{simulate} method can delete the input parameters and fitness
-of the result \code{data.frame} respectively.
+A data.frame where each line corresponds to a simulation. The
+results include :
+- the last generation reached (the threshold or the generation that first
+verified at least one of the stopping conditions)
+- the final population size
+- the genotype frequencies
+- allelic frequencies
+- the reason(s) for the stop (either the threshold was reached, i.e.
+\code{unstopped} or the stop condition(s) that was (were) reached, in the
+form of boolean values
+- Average fitness (individual, gamete production and gametic)
 }
 \description{
-A simple function to retrieve the results of a simulation of an
-\code{Ease} object. The results can be given as a list of \code{data.frames}
-distinguishing: the parameters, the genotypic frequencies (unless
-they have not been recorded), the generations, and the stop conditions.
-}
-\examples{
-LD <- list(dl = as.factor(c("A", "a")))
-HL <- list(hl = as.factor(c("B", "b")))
-genomeObj <- setGenome(listHapLoci = HL, listDipLoci = LD)
-selectionObj <- setSelectOnInds(
-  genomeObj = genomeObj,
-  indFit = c(1, 1, 1, 1, 0.5, 0)
-)
-mutMatrixObj <- setMutationMatrixByRates(genomeObj = genomeObj, forwardMut = 1e-2)
-mod <- setEase(
-  N = 100, threshold = 1e6, dioecy = FALSE, selfRate = 0.5,
-  stopCondition = list("a", "b"),
-  mutMatrixObj = mutMatrixObj,
-  genomeObj = genomeObj,
-  selectionObj = selectionObj
-)
-
-mod <- simulate(mod, nsim = 10)
-
-# As a single \code{data.frame} :
-getResults(mod)
-
-# As a list :
-getResults(mod, asList = TRUE)
-
+Getting the simulation results
 }
 \author{
 Ehouarn Le Faou

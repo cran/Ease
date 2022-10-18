@@ -13,6 +13,17 @@
 #'
 NULL
 
+#' Standardisation of a matrix
+#'
+#' Divides each cell of a matrix by its sum, so that the sum of all these
+#' cells becomes 1.
+#'
+#' @param x matrix
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
 #' Matrix row bind
 #'
 #' Binding of two matrices by their row. Both matrices must have the same
@@ -25,13 +36,80 @@ NULL
 #'
 NULL
 
+#' Matrix col bind
+#'
+#' Binding of two matrices by their columns. Both matrices must have the same
+#' number of columns.
+#'
+#' @param MAT1 matrix
+#' @param MAT2 matrix
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
+#' Logical matrix col bind
+#'
+#' Binding of two logical matrices by their columns. Both matrices must have the same
+#' number of columns.
+#'
+#' @param MAT1 logical matrix
+#' @param MAT2 logical matrix
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
+#' Sum of a matrix
+#'
+#' Sum of all the cells of one matrix.
+#'
+#' @param MAT matrix
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
+#' Mean of two matrices
+#'
+#' Calculates the average of the values of each cell one by one.
+#'
+#' @param MAT1 matrix
+#' @param MAT2 matrix
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
+#' Binding matrices on matrices
+#'
+#' Links to each of the matrices in the REF_LIST list the
+#' matrices in the ADD_LIST list, respectively.
+#'
+#' @param REF_LIST list of reference matrices
+#' @param ADD_LIST list of matrices to ve added
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
+#' Binding vectors on vectors
+#'
+#' Links to each of the vectors in the REF_LIST list the
+#' vectors in the ADD_LIST list, respectively.
+#'
+#' @param REF_LIST list of reference vectors
+#' @param ADD_LIST list of vectors to ve added
+#'
+#' @author Ehouarn Le Faou
+#'
+NULL
+
 #' Importing the multinomial draw function from R into C++
 #'
 #' @param size number of random vectors to draw.
 #' @param probs event probabilites
 #' @param N number of trials
-#'
-#' @author Ehouarn Le Faou
 #'
 NULL
 
@@ -40,8 +118,6 @@ NULL
 #' @param n number of trials
 #' @param size number of random vectors to draw.
 #' @param probs event probabilites
-#'
-#' @author Ehouarn Le Faou
 #'
 NULL
 
@@ -75,17 +151,6 @@ NULL
 #'
 #' @param freqAlleles allelic frequencies
 #' @param stopCondition list of stop conditions
-#'
-#' @author Ehouarn Le Faou
-#'
-NULL
-
-#' Standardisation of a matrix
-#'
-#' Divides each cell of a matrix by its sum, so that the sum of all these
-#' cells becomes 1.
-#'
-#' @param x matrix
 #'
 #' @author Ehouarn Le Faou
 #'
@@ -154,43 +219,6 @@ NULL
 #'
 NULL
 
-#' Reproduction of an hermaphroditic population
-#'
-#' Reproduction of a hermaphroditic population by selfing and outcrossing,
-#' knowing their respective frequencies.
-#'
-#' @param nbHaplo number of haplotypes
-#' @param nbGeno number of genotypes
-#' @param selfRate selfing rate
-#' @param freqGeno genotype frequencies
-#' @param gametogenesisMat gametogenesis matrix
-#' @param haploCrossMat haplotypes crossing matrix
-#' @param femgamFit fitness of female gametes
-#' @param malegamFit fitness of male gametes
-#' @param femProdFit fitness for female gamete production
-#' @param maleProdFit fitness for male gamete production
-#'
-#' @author Ehouarn Le Faou
-#'
-NULL
-
-#' Reproduction of a dioecious population
-#'
-#' @param nbHaplo number of haplotypes
-#' @param nbGeno number of genotypes
-#' @param freqGenoFemale female genotype frequencies
-#' @param freqGenoMale male genotype frequencies
-#' @param gametogenesisMat gametogenesis matrix
-#' @param haploCrossMat haplotypes crossing matrix
-#' @param femgamFit fitness of female gametes
-#' @param malegamFit fitness of male gametes
-#' @param femProdFit fitness for female gamete production
-#' @param maleProdFit fitness for male gamete production
-#'
-#' @author Ehouarn Le Faou
-#'
-NULL
-
 #' Selection on individuals
 #'
 #' Selection on individuals (selection on gametes and gamete production is
@@ -204,86 +232,49 @@ NULL
 #'
 NULL
 
-#' Simulate the model
-#'
-#' @param recording a boolean indicating whether to record all mutations, i.e.
-#' to record allelic and genotypic frequencies along the simulations
-#' @param recordGenGap the number of generations between two records during
-#' simulation, if the record parameter is TRUE. Whatever the value of this
-#' parameter, both the first and the last generation will be included in
-#' the record
-#' @param drift a boolean indicating whether genetic drift should be
-#' considered (i.e. whether deterministic simulations are performed or not)
-#' @param nbHaplo number of haplotypes
-#' @param nbGeno number of genotypes
-#' @param nbAlleles number of alleles for each loci
-#' @param initGenoFreq initial genotype frequencies
-#' @param gametogenesisMat gametogenesis matrix
-#' @param N population size
-#' @param threshold threshold for simulations
-#' @param dioecy whether the population is dioecious or not (hermaphrodism)
-#' @param selfRate selfing rate (only for hermaphroditic population)
-#' @param stopCondition list of stop conditions
-#' @param haploCrossMat haplotypes crossing matrix
-#' @param alleleFreqMat matrix for calculating allelic frequencies
-#' @param femgamFit fitness of female gametes
-#' @param malegamFit fitness of male gametes
-#' @param femindFit fitness of female individuals
-#' @param maleindFit fitness of male individuals
-#' @param indFit fitness of individuals (only for hermaphroditic population)
-#' @param femProdFit fitness for female gamete production
-#' @param maleProdFit fitness for male gamete production
-#'
-#' @author Ehouarn Le Faou
-#'
-NULL
-
-#' Simulate the model multiple times
-#'
-#' Simulation of the model multiple times with all the necessary parameters
-#' set.
-#'
-#' @param nsim number of simulations
-#' @param recording a boolean indicating whether to record all mutations, i.e.
-#' to record allelic and genotypic frequencies along the simulations
-#' @param recordGenGap the number of generations between two records during
-#' simulation, if the record parameter is TRUE. Whatever the value of this
-#' parameter, both the first and the last generation will be included in
-#' the record
-#' @param drift a boolean indicating whether genetic drift should be
-#' considered (i.e. whether deterministic simulations are performed or not)
-#' @param nbHaplo number of haplotypes
-#' @param nbGeno number of genotypes
-#' @param nbAlleles number of alleles for each loci
-#' @param initGenoFreq initial genotype frequencies
-#' @param gametogenesisMat gametogenesis matrix
-#' @param N population size
-#' @param threshold threshold for simulations
-#' @param dioecy whether the population is dioecious or not (hermaphrodism)
-#' @param selfRate selfing rate (only for hermaphroditic population)
-#' @param stopCondition list of stop conditions
-#' @param haploCrossMat haplotypes crossing matrix
-#' @param alleleFreqMat matrix for calculating allelic frequencies
-#' @param femgamFit fitness of female gametes
-#' @param malegamFit fitness of male gametes
-#' @param femindFit fitness of female individuals
-#' @param maleindFit fitness of male individuals
-#' @param indFit fitness of individuals (only for hermaphroditic population)
-#' @param femProdFit fitness for female gamete production
-#' @param maleProdFit fitness for male gamete production
-#' @param verbose boolean determining if the progress of the simulations should be displayed or not (useful in case of many simulations)
-#'
-#' @return Each simulation is described by data.frame where each line corresponds to a generation (by default,
-#' otherwise according to the \code{recordGenGap} parameter of the \code{simulate} method). The first one(s) describe(s)
-#' the genotypic frequencies at the end of the simulations of the individuals in the case of a hermaphroditic population
-#' or of the females then of the males in the case of a dioecious population. Then there are in order: the allelic
-#' frequencies at the end of the simulations, the generations where the simulations stopped, the stop conditions reached.
-#' Then there are the lists of records where each simulation is described by a data.frame where each line is a generation.
-#' The record lists correspond to the genotypic frequencies, the allelic frequencies and finally the generations.
+#' Simulation of a metapopulation
 #' 
+#' @param nbPop number of populations in the metapopulation
+#' @param ids population IDs
+#' @param migMat migration matrix
+#' @param nsim number of simulations
+#' @param verbose boolean determining if the progress of the simulations should be displayed or not (useful in case of many simulations)
+#' @param recording a boolean indicating whether to record all mutations, i.e.
+#' to record allelic and genotypic frequencies along the simulations
+#' @param recordGenGap the number of generations between two records during
+#' simulation, if the record parameter is TRUE. Whatever the value of this
+#' parameter, both the first and the last generation will be included in
+#' the record
+#' @param drift a boolean indicating whether genetic drift should be
+#' considered (i.e. whether deterministic simulations are performed or not)
+#' @param nbHaplo number of haplotypes
+#' @param nbGeno number of genotypes
+#' @param idGeno genotypes ID
+#' @param nbAlleles number of alleles for each loci
+#' @param idAlleles alleles ID
+#' @param nbLoci number of loci
+#' @param initGenoFreq list of initial genotype frequencies in the populations
+#' @param meiosisMat meiosis matrix
+#' @param gametogenesisMat gametogenesis matrix
+#' @param popSize list population sizes
+#' @param threshold threshold for simulations
+#' @param dioecy whether the population(s) is dioecious or not (hermaphrodism)
+#' @param selfRate list of the selfing rate in populations (only for hermaphroditic population)
+#' @param stopCondition list of stop conditions
+#' @param IDstopCondition vector of stop condition ID
+#' @param haploCrossMat haplotypes crossing matrix
+#' @param alleleFreqMat matrix for calculating allelic frequencies
+#' @param gamFit fitness of gametes
+#' @param indFit fitness of individuals
+#' @param gamProdFit fitness for gamete production
+#' @param demography list of population demographies
+#' @param growthRate list of population growth rates
+#' @param initPopSize list of initial population
+#' @param nameOutFunct name of the custom output function
+#'
 #' @author Ehouarn Le Faou
 #'
-SIMULATION_MULTIPLE <- function(nsim, recording, recordGenGap, drift, nbHaplo, nbGeno, nbAlleles, initGenoFreq, gametogenesisMat, N, threshold, dioecy, selfRate, stopCondition, haploCrossMat, alleleFreqMat, femgamFit, malegamFit, femindFit, maleindFit, indFit, femProdFit, maleProdFit, verbose) {
-    .Call(`_Ease_SIMULATION_MULTIPLE`, nsim, recording, recordGenGap, drift, nbHaplo, nbGeno, nbAlleles, initGenoFreq, gametogenesisMat, N, threshold, dioecy, selfRate, stopCondition, haploCrossMat, alleleFreqMat, femgamFit, malegamFit, femindFit, maleindFit, indFit, femProdFit, maleProdFit, verbose)
+METAPOP_SIMULATION <- function(nbPop, ids, migMat, nsim, verbose, recording, recordGenGap, drift, nbHaplo, nbGeno, idGeno, nbAlleles, idAlleles, nbLoci, initGenoFreq, meiosisMat, gametogenesisMat, popSize, threshold, dioecy, selfRate, stopCondition, IDstopCondition, haploCrossMat, alleleFreqMat, gamFit, indFit, gamProdFit, demography, growthRate, initPopSize, nameOutFunct) {
+    .Call(`_Ease_METAPOP_SIMULATION`, nbPop, ids, migMat, nsim, verbose, recording, recordGenGap, drift, nbHaplo, nbGeno, idGeno, nbAlleles, idAlleles, nbLoci, initGenoFreq, meiosisMat, gametogenesisMat, popSize, threshold, dioecy, selfRate, stopCondition, IDstopCondition, haploCrossMat, alleleFreqMat, gamFit, indFit, gamProdFit, demography, growthRate, initPopSize, nameOutFunct)
 }
 
