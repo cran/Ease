@@ -1,4 +1,8 @@
-# Ease 0.1.1 (19/10/2022)
+# Ease 0.1.2 (19/10/2022)
+
+* Bug fix
+
+# Ease 0.1.1 (18/10/2022)
 
 * Changes
 	* The plot method has been removed: it was not really useful and required the addition of ggplot2 as a dependency of the package

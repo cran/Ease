@@ -1,6 +1,4 @@
 #include <Rcpp.h>
-#include <bits/stdc++.h>
-#include <list>
 
 // [[Rcpp::depends(RcppProgress)]]
 #include <progress.hpp>

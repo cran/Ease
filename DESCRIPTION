@@ -1,7 +1,7 @@
 Package: Ease
 Type: Package
 Title: Simulating Explicit Population Genetics Models
-Version: 0.1.1
+Version: 0.1.2
 Author: Ehouarn Le Faou <ehouarnlefaou@orange.fr> [aut, cre]
 Maintainer: Ehouarn Le Faou <ehouarnlefaou@orange.fr>
 Description: Implementation in a simple and efficient way of fully customisable population genetics simulations,
@@ -24,6 +24,6 @@ Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2022-10-18 15:36:30 UTC; ehoua
+Packaged: 2022-10-19 07:44:55 UTC; ehoua
 Repository: CRAN
-Date/Publication: 2022-10-18 16:07:53 UTC
+Date/Publication: 2022-11-07 14:40:08 UTC

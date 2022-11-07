@@ -1,7 +1,7 @@
-5bb9661a146825819fccfdd56948adab *DESCRIPTION
+d182b0aed2ad431f64e68fee575949b8 *DESCRIPTION
 aa1b580a514151cfb9096030a64c10da *LICENSE
-ad588c5c9dcebca2e6f3574c1e240ef7 *NAMESPACE
-27bbffce42bc05126dde3fe36bec78e6 *NEWS.md
+68887bc021daeda4d2e449553a43971b *NAMESPACE
+f6eae2170dc90eb51bc73bb585c454f7 *NEWS.md
 89d41793383a148356ea779e2727ec77 *R/GenomeClass.R
 3f1d0cbd3209c4d5f87e087ca427ca71 *R/MetapopulationClass.R
 160756b994bff65271836d1307f527fc *R/ModelFunctions.R
@@ -14,7 +14,7 @@ c727b73e6219b0952c3ba84b9108a65b *R/UserFunctions.R
 25ce8ac1e2b07f48117b2a98f784c1d1 *build/vignette.rds
 f4747f7347c7f170597fd942da50150a *inst/doc/use-the-Ease-package.R
 fcbe0e0587e4184ccda581774979a4a3 *inst/doc/use-the-Ease-package.Rmd
-fe8ab9b86ff1023f4e8b25c21807e3b2 *inst/doc/use-the-Ease-package.html
+2738cad855cbb6c864c14517013b27a9 *inst/doc/use-the-Ease-package.html
 202cac652cdf0a90161db3a0c6e8fa36 *man/Genome-class.Rd
 6bfca20939d8676884e855aeb9db88e1 *man/IDgenomeGeneration.Rd
 a8b89135c45a3fdcc5284817e46158d0 *man/IDgenotypeGeneration.Rd
@@ -80,7 +80,7 @@ fb68f70473047bc99601e24ee94b97c6 *man/setSelectOnGametesProd.Rd
 d644bbdec379fd165465b5d11b2445fc *man/show-Selection-method.Rd
 4c287e97a0c076beaa10351e936f9d08 *man/simulate-Metapopulation-method.Rd
 9b0344f32bb0a40ba2f47262487a48c2 *man/whichHomoz.Rd
-0ab9bf0ae9ec72acf87cda35eddfcb53 *src/Ease_cpp.cpp
+b726e32954a18ada455e003d0acb20cb *src/Ease_cpp.cpp
 48ede89ba13d3bd9ada8e74418ddb5e5 *src/RcppExports.cpp
 94501654b2cfe3aedf50dd6ced03be65 *tests/testthat.R
 e0459a7e2d6f7f9eed8a16e493772f60 *tests/testthat/testGenome.R
